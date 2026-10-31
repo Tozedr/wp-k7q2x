@@ -167,9 +167,19 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "w.title": "Профиль <em>желаний</em>",
   "w.l1": "Короткая анкета о том, что тебе нравится, что заводит и что мешает. Результат полезен и для себя, и для разговора с партнёром.",
   "w.l2": "Основная часть, ядро, занимает 8–9 минут. Ответы хранятся только на этом устройстве.",
-  "w.l3": "Если был тяжёлый опыт, темы, которые не хочется видеть, можно скрыть.",
+  "w.l3": "Начнём с простого. Откровенные вопросы будут позже и только по желанию.",
   "w.hide": "Скрыть темы",
-  "w.hide_hint": "Скрытые темы не появятся в анкете и в идеях. Это можно поменять в настройках.",
+  "w.hide_hint": "Отмеченные темы не появятся ни в откровенных вопросах, ни в модулях, ни в идеях. Это можно поменять в настройках.",
+  "i.title": "Какие тут вопросы",
+  "i.lead": "Анкета идёт от простого к личному. Вот что впереди.",
+  "i.s1.t": "Сначала о тебе",
+  "i.s1": "Как к тебе обращаться, есть ли ограничения по здоровью, ориентация и отношения. Это нужно, чтобы вопросы и формулировки подходили тебе.",
+  "i.s2.t": "Потом ядро",
+  "i.s2": "Что тебя заводит, что мешает и какой стиль ближе. Без подробностей о практиках, 8–9 минут. В конце — результат.",
+  "i.s3.t": "Откровенные вопросы — по желанию",
+  "i.s3": "Только после результата и если захочешь. Перед ними можно отметить темы, которые не хочется видеть.",
+  "i.skip": "Любой вопрос можно пропустить. Остановиться можно в любой момент кнопкой «Хватит на сегодня», ответы сохранятся.",
+  "i.hard": "Если какая-то тема связана с тяжёлым опытом, её можно пропустить или скрыть. Здесь ничего не нужно объяснять.",
   "w.start": "Начать",
   "w.continue": "Продолжить",
   "w.back_again": "С возвращением. Ответы на месте.",
@@ -1570,7 +1580,7 @@ const AXES = {
 /* ---------- screens ---------- */
 // kind: "items" screens list question IDs; "form" screens list profile fields
 const SCREENS = [
-  {id:"welcome"}, {id:"terms"}, {id:"lang"}, {id:"storage"}, {id:"pin"},
+  {id:"welcome"}, {id:"terms"}, {id:"intro"}, {id:"lang"}, {id:"storage"}, {id:"pin"},
   {id:"identity", step:["base",1]}, {id:"body_early", step:["base",2]}, {id:"orient", step:["base",3]}, {id:"rel", step:["base",4]},
   {id:"w1", kind:"items", type:"yn", title:"core.w1", items:ids("w",1,8), step:["core",1]},
   {id:"g1", kind:"items", type:"lik", title:"core.g", items:ids("g",1,6), step:["core",2]},
@@ -1852,7 +1862,6 @@ const VIEWS = {
     return `<header class="screen" style="padding-top:44px"><h1>${t("w.title")}</h1></header>
     <div class="stack"><p>${t("w.l1")}</p><p>${t("w.l2")}</p><p class="muted">${t("w.l3")}</p>
     ${started?`<p class="note">${t("w.back_again")}</p>`:""}</div>
-    <div class="card">${hiddenTopicsField()}</div>
     <div class="row"><button class="btn" data-act="${started?"resume":"next"}">${started?t("w.continue"):t("w.start")}</button>
     ${started?`<button class="btn ghost" data-act="go" data-to="settings">${t("common.settings")}</button>`:""}</div>`;
   },
@@ -1865,6 +1874,11 @@ const VIEWS = {
       `<div class="stack">${box("age",t("t.age"))}${box("terms",t("t.terms"),t("t.terms_hint"))}${box("data",t("t.data"),t("t.data_hint"))}${box("diag",t("t.diag"))}</div>
       <p class="small"><button class="btn link small" data-act="go" data-to="docs">${t("t.read")}</button></p>
       <div class="nav"><button class="btn ghost" data-act="go" data-to="under18">${t("t.under")}</button><button class="btn" data-act="accept" ${all?"":"disabled"}>${t("common.next")}</button></div>`;
+  },
+  intro(){   // spec 0.1 + sexologist review #29: what kind of questions lie ahead, before anything personal
+    const st = k => `<div class="field"><p class="q">${t("i."+k+".t")}</p><p class="muted">${t("i."+k)}</p></div>`;
+    return head("Вход", t("i.title"), t("i.lead")) + `<div class="card stack">${st("s1")}${st("s2")}${st("s3")}</div>
+      <div class="stack"><p>${t("i.skip")}</p><p class="muted">${t("i.hard")}</p></div>` + navRow();
   },
   under18(){
     return head("", t("u.title"), "") + `<p>${t("u.text")}</p>${lsGet(STORE_KEY)?`<p class="small muted">${t("u.saved")}</p>`:""}
@@ -1923,7 +1937,7 @@ const VIEWS = {
       <div class="row small"><span class="muted">Быстро отметить:</span><button class="btn link small" data-act="anatquick" data-set="p">${t("opt.anat.quick_p")}</button><button class="btn link small" data-act="anatquick" data-set="v">${t("opt.anat.quick_v")}</button></div>
       ${choice("body.stop_zones","zone",["face","neck","chest","belly","buttocks","anus","feet","genitals","none"],{multi:true,exclusive:["none"]})}
       ${choice("orientation.partner_anatomy","anat",["penis","testes","prostate","vulva","vagina","varies","undisclosed"],{multi:true,exclusive:["varies","undisclosed"]})}
-      </div>` + navRow();
+      </div><div class="card">${hiddenTopicsField()}</div>` + navRow();
   },
   result(){ return resultView(); },
   pause(){

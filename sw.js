@@ -1,5 +1,5 @@
 // Offline cache for the prototype: app shell only, answers live in localStorage
-const CACHE = "wp-profile-core-v7";
+const CACHE = "wp-profile-core-v8";
 const FONTS = ["CormorantGaramond-normal-cyrillic", "CormorantGaramond-normal-latin", "CormorantGaramond-italic-cyrillic", "CormorantGaramond-italic-latin", "GolosText-normal-cyrillic", "GolosText-normal-latin"];
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon.svg", "fonts/fonts.css", ...FONTS.map(f => `fonts/${f}.woff2`)];
 self.addEventListener("install", e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))));
