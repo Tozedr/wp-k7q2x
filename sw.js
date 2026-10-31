@@ -1,6 +1,6 @@
 // Offline cache for the prototype: app shell only, answers live in localStorage.
 // The page itself is network-first, so a new deploy shows up on the next open; the cache is the offline fallback.
-const CACHE = "wp-profile-core-v9";
+const CACHE = "wp-profile-core-v10";
 const FONTS = ["CormorantGaramond-normal-cyrillic", "CormorantGaramond-normal-latin", "CormorantGaramond-italic-cyrillic", "CormorantGaramond-italic-latin", "GolosText-normal-cyrillic", "GolosText-normal-latin"];
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon.svg", "fonts/fonts.css", ...FONTS.map(f => `fonts/${f}.woff2`)];
 self.addEventListener("install", e => {
