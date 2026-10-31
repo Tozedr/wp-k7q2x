@@ -201,6 +201,40 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .cols{display:grid;gap:10px;width:100%}
 .col{display:grid;gap:4px}
 summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+/* modules one per screen */
+.qone .item{padding:0;border:0}
+.qone .item>.q,.qone .item>.hint{display:none}
+.qone .ans{display:grid;gap:10px}
+.qone .seg{display:grid;gap:8px}
+.qone .seg button{min-height:52px;border-radius:16px;text-align:left;padding:0 18px;font-size:15px;width:100%}
+.qone .cols .seg{grid-template-columns:repeat(3,1fr)}
+.qone .cols .seg button{text-align:center;padding:0 6px}
+.qone .col{gap:8px}
+.qone .col>.small{font-size:14px;color:var(--fg)}
+.qone .skip{display:none}
+/* stories */
+.story{min-height:calc(100svh - 20px);display:flex;flex-direction:column;gap:14px;padding-top:14px;position:relative}
+.story .bars{display:flex;gap:4px}
+.story .bars i{flex:1;height:3px;border-radius:2px;background:#3A2A32}
+.story .bars i.on{background:var(--fg)}
+.story .slide{flex:1;display:flex;flex-direction:column;gap:16px;position:relative;z-index:2;pointer-events:none}
+.story .slide button,.story .slide summary{pointer-events:auto}
+.story h2{font-size:clamp(38px,11vw,48px);line-height:.98}
+.story .slide>p{font-size:16px;color:#E2CDD5}
+.story .gauges{display:grid;gap:14px;margin-top:auto}
+.story .g{display:grid;gap:6px}
+.story .g .l{display:flex;justify-content:space-between;font-size:14px;color:#D1BCC5}
+.story .g .t{height:12px;border-radius:6px;background:#2E1F27;overflow:hidden}
+.story .g .t i{display:block;height:100%;border-radius:6px}
+.story .disc{font-size:12px;color:var(--muted)}
+.story .fine{font-size:12px;color:var(--muted);text-align:center;position:relative;z-index:2}
+.tapzones{position:absolute;inset:40px 0 0;display:grid;grid-template-columns:30% 70%;z-index:1}
+.tapzones button{min-height:100%}
+.tapzones button:focus-visible{outline-offset:-4px}
+/* pair */
+.pairhero{display:grid;gap:2px;justify-items:center;text-align:center;padding:10px 0 4px}
+.pairhero b{font-family:var(--display);font-size:72px;line-height:1;font-weight:600;color:var(--accent)}
+.pairhero span{font-size:15px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1620,7 +1654,31 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "chat.cards_how": "Я покажу карточки. Свайп вправо — «да», влево — «нет», вверх — «может». Кнопки под картой работают так же.",
   "chat.swipe": "Свайп: вправо — да, влево — нет, вверх — может",
   "chat.topics_none": "Ничего не скрывать",
-  "chat.hide_none": "Ничего не скрывать"
+  "chat.hide_none": "Ничего не скрывать",
+  "deck.done": "Готово: отвечено {n} из {k}. Можно пройти карты ещё раз или идти дальше.",
+  "deck.again": "Пройти карты заново",
+  "mod.to_list_short": "Темы",
+  "story.k": "Твой профиль · {n} из {k}",
+  "story.skip": "Весь профиль",
+  "story.tap": "Касание справа — дальше, слева — назад",
+  "story.open": "Смотреть как сторис",
+  "story.full": "Открыть весь профиль",
+  "story.of5": "{v} из 5",
+  "story.gas": "Что заводит",
+  "story.brakes": "Что мешает",
+  "story.h.gas": "Газ у тебя <em>сильнее</em> тормозов",
+  "story.h.brakes": "Тормоза сейчас <em>громче</em> газа",
+  "story.h.even": "Газ и тормоза <em>в равновесии</em>",
+  "story.top_h": "Что тебя <em>заводит</em> сильнее всего",
+  "story.brk_h": "Что сбивает <em>настрой</em>",
+  "story.brk_note": "Тормоза есть у всех, и они меняются. Что с ними делать — в полном профиле.",
+  "story.style_h": "Твой <em>стиль</em>",
+  "story.int_h": "Что тебе <em>интересно</em>",
+  "story.int_note": "Розовое — «да», жёлтое — «может».",
+  "story.end": "Это <em>твой</em> профиль",
+  "story.end_lead": "Дальше — полный разбор с подсказками, темы на выбор и игра вдвоём.",
+  "pair.hero": "общих «да»",
+  "pair.hero_m": "и ещё {n} «может» — повод поговорить"
 }
 </script>
 
@@ -1862,7 +1920,9 @@ function next(){
     } }
   if(SCR[cur]?.extra) P.modules.core_explicit = {done:true, at:now()};
   if(!P.modules.core) P.modules.core = {done:true, at:now()};
+  const firstTime = !UI.storySeen;
   UI.resultSeen = true; UI.extraFlow = false;
+  if(firstTime){ UI.storySeen = true; UI.storyI = 0; return go("story"); }
   go("result");
 }
 function back(){
@@ -1984,6 +2044,7 @@ const VIEWS = {
   rel(){ return chatForm("rel"); },
   body_late(){ return chatForm("body_late"); },
   result(){ return resultView(); },
+  story(){ return storyView(); },
   pause(){
     const again = UI.pauseAgain;
     return head("", t("pause.title"), t("pause.text")) + `${again?`<div class="flag"><p>${t("pause.again")}</p><div class="row"><button class="btn ghost" data-act="skipfrom">${t("pause.skip_block")}</button><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button></div></div>`:""}
@@ -2044,18 +2105,23 @@ function itemsView(s){
       ${[1,2,3,4,5].map(n=>`<button class="opt" role="radio" aria-checked="${v===n}" data-act="ans" data-id="${id}" data-val="${n}"><span class="n">${n}</span>${esc(labels[n-1])}</button>`).join("")}
       ${NA_OK.has(id)?`<button class="opt na" role="radio" aria-checked="${v==="na"}" data-act="ans" data-id="${id}" data-val="na">${t("opt.lik.na")}</button>`:""}</div>`;
   } else {
-    const stamp = k => `<div class="stamp ${k[0]}${v===({y:2,m:1,n:0})[k[0]]?" on":""}" data-stamp="${k[0]}">${t("opt.yn."+k)}</div>`;
-    body = `<div class="deck">${i<list.length-2?'<div class="qcard b1"></div>':""}${i<list.length-1?'<div class="qcard b2"></div>':""}
-      <div class="qcard front" id="qcard" data-id="${id}" role="group" aria-labelledby="q-${id}">
-        <div class="suit"><span>${esc(t(s.title+".lead").split("?")[0])}?</span><span>♥ ${String(i+1).padStart(2,"0")}</span></div>
-        ${stamp("yes")}${stamp("no")}${stamp("maybe")}
-        <div class="cq" id="q-${id}">${esc(qText(id))}</div>${hint?`<div class="sub">${esc(hint)}</div>`:""}
-      </div></div>
-      <div class="acts" role="group" aria-label="${esc(qText(id))}">
-        ${[[0,"no","n","✕"],[2,"yes","y","♥"],[1,"maybe","m","?"]].map(([val,k,c,ic])=>`<button class="act ${c}" aria-pressed="${v===val}" data-act="ans" data-id="${id}" data-val="${val}"><i aria-hidden="true">${ic}</i>${t("opt.yn."+k)}</button>`).join("")}
-      </div><p class="swipehint">${t("chat.swipe")}</p>`;
+    body = cardHTML(id, qText(id), v, {suit:t(s.title+".lead").split("?")[0]+"?", num:i+1, left:list.length-1-i, sub:hint});
   }
   return bar(s, "qback") + `<div class="qpage">${meta}${body}${foot}</div>`;
+}
+// one yes/maybe/no card; buttons carry the screen's own action so swipe, tap and arrows all go through the same handler
+function cardHTML(id, text, v, {act="ans", suit="", num=1, left=0, sub="", dunno=false, extra=""}={}){
+  const stamp = k => `<div class="stamp ${k[0]}${v===({y:2,m:1,n:0})[k[0]]?" on":""}" data-stamp="${k[0]}">${t("opt.yn."+k)}</div>`;
+  return `<div class="deck">${left>1?'<div class="qcard b1"></div>':""}${left>0?'<div class="qcard b2"></div>':""}
+    <div class="qcard front" id="qcard" data-id="${id}" role="group" aria-labelledby="q-${esc(id)}">
+      <div class="suit"><span>${esc(suit)}</span><span>♥ ${String(num).padStart(2,"0")}</span></div>
+      ${stamp("yes")}${stamp("no")}${stamp("maybe")}
+      <div class="cq" id="q-${esc(id)}">${esc(text)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:""}
+    </div></div>
+    <div class="acts" role="group" aria-label="${esc(text)}">
+      ${[[0,"no","n","✕"],[2,"yes","y","♥"],[1,"maybe","m","?"]].map(([val,k,c,ic])=>`<button class="act ${c}" aria-pressed="${v===val}" data-act="${act}" data-id="${id}" data-val="${val}" data-one="1"><i aria-hidden="true">${ic}</i>${t("opt.yn."+k)}</button>`).join("")}
+    </div>${dunno?`<div class="row" style="justify-content:center"><button class="chip" aria-pressed="${v===null}" data-act="${act}" data-id="${id}" data-val="x" data-one="1">${t("guess.dunno")}</button></div>`:""}${extra}
+    <p class="swipehint">${t("chat.swipe")}</p>`;
 }
 function qAdvance(){
   const s = SCR[UI.screen], n = visItems(s).length, i = qIndex(s);
@@ -2209,6 +2275,36 @@ function meterRow(label, v, max, muted){
   const w = v==null?0:Math.max(0,Math.min(1,(v-1)/(max-1)))*100;
   return `<div class="meter"><span>${esc(label)}</span><span class="t${muted?" mut":""}"><i style="width:${w}%"></i></span><span class="v">${v==null?"—":String(Math.round(v*10)/10).replace(".",",")}</span></div>`;
 }
+// the profile as stories: one thought per slide, then the full profile
+function storyView(){
+  const S = computeScales();
+  const gas = mean(ids("g",1,11).map(num)), brk = mean(Object.values(S.brakes));
+  const head_ = gas==null && brk==null ? "" : (gas??0)-(brk??0) >= 0.75 ? t("story.h.gas") : (brk??0)-(gas??0) >= 0.75 ? t("story.h.brakes") : t("story.h.even");
+  const ease = S.gas.ease, isAce = P.orientation.label==="ace";
+  const easeText = ease==null ? "" : isAce ? t("r.gas.ease_ace",{v:String(ease).replace(".",",")}) : ease>=4 ? t("r.gas.ease_hi") : ease>=2.75 ? t("r.gas.ease_mid") : t("r.gas.ease_lo");
+  const g = (lab,v,c) => `<div class="g"><div class="l"><span>${lab}</span><span>${v==null?"—":t("story.of5",{v:String(Math.round(v*10)/10).replace(".",",")})}</span></div><div class="t"><i style="width:${v==null?0:v/5*100}%;background:${c}"></i></div></div>`;
+  const tops = Object.entries(S.gas.channels).filter(([,v])=>v>=4).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const brakes = Object.entries(S.brakes).sort((a,b)=>b[1]-a[1]).slice(0,2).filter(([,v])=>v>=3);
+  const axes = Object.entries(S.axes).filter(([,v])=>Math.abs(v)>=0.5).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3);
+  const ym = yesMaybe(), ys = Object.values(ym).flatMap(x=>x.y).slice(0,8), ms = Object.values(ym).flatMap(x=>x.m).slice(0,4);
+  const slides = [];
+  if(head_) slides.push(`<h2>${head_}</h2>${easeText?`<p>${easeText}</p>`:""}<div class="gauges">${g(t("story.gas"),gas,"var(--accent)")}${g(t("story.brakes"),brk,"var(--maybe)")}</div><p class="disc">${t("r.disclaimer")}</p>`);
+  if(tops.length) slides.push(`<h2>${t("story.top_h")}</h2><div class="acc">${tops.map(([k])=>`<div class="a"><b>${t("ch."+k)}</b><span>${t("idea.ch."+k)}</span></div>`).join("")}</div>`);
+  if(brakes.length) slides.push(`<h2>${t("story.brk_h")}</h2><div class="stack">${brakes.map(([k])=>`<div class="brk"><b>${t("brk."+k)}</b><span class="small">${t("brk.d."+k)}</span></div>`).join("")}</div><p class="disc">${t("story.brk_note")}</p>`);
+  if(axes.length) slides.push(`<h2>${t("story.style_h")}</h2><div class="stack">${axes.map(([k,v])=>`<div class="brk"><span class="small muted">${t("ax."+k)}</span><b class="big" style="font-size:24px">${t("ax."+k+(v<0?".l":".r"))}</b></div>`).join("")}</div><p class="disc">${t("r.style.lead")}</p>`);
+  if(ys.length||ms.length) slides.push(`<h2>${t("story.int_h")}</h2><div class="pills">${ys.map(id=>`<span class="pill y">${esc(qText(id))}</span>`).join("")}${ms.map(id=>`<span class="pill m">${esc(qText(id))}?</span>`).join("")}</div><p class="disc">${t("story.int_note")}</p>`);
+  const canInvite = hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only";
+  slides.push(`<h2>${t("story.end")}</h2><p>${t("story.end_lead")}</p><div class="stack" style="margin-top:auto">
+    <button class="btn wide" data-act="go" data-to="result">${t("story.full")}</button>
+    ${canInvite?`<button class="btn ghost" data-act="go" data-to="invite">${t("r.invite.open")}</button>`:""}
+    <button class="btn ghost" data-act="go" data-to="mods">${t("r.next.all")}</button></div>`);
+  const i = Math.max(0, Math.min(slides.length-1, UI.storyI||0)), lastI = slides.length-1;
+  return `<div class="story"><div class="bars">${slides.map((_,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
+    <div class="row" style="justify-content:space-between;position:relative;z-index:3"><span class="eyebrow">${t("story.k",{n:i+1,k:slides.length})}</span><button class="stop" data-act="go" data-to="result">${t("story.skip")}</button></div>
+    <div class="slide">${slides[i]}</div>
+    ${i<lastI?`<div class="tapzones"><button data-act="storygo" data-i="${i-1}" aria-label="${t("common.back")}" ${i?"":"disabled"}></button><button data-act="storygo" data-i="${i+1}" aria-label="${t("common.next")}"></button></div>
+    <p class="fine">${t("story.tap")}</p>`:`${i?`<button class="btn link" data-act="storygo" data-i="${i-1}">← ${t("common.back")}</button>`:""}`}</div>`;
+}
 function resultView(){
   const S = computeScales(); P.scales = S;
   const isAce = P.orientation.label==="ace";
@@ -2307,7 +2403,7 @@ function resultView(){
 
   const name = P.identity.name ? esc(P.identity.name) : "";
   return `<header class="screen" style="padding-top:32px"><p class="eyebrow">${name||t("app.name")}</p><h2 style="font-size:40px">${t("r.title")}</h2>
-    <p class="note">${t("r.disclaimer")}</p></header>
+    <p class="note">${t("r.disclaimer")}</p>${anyAnswer?`<div class="row"><button class="btn ghost" data-act="storygo" data-i="0" data-open="1">${t("story.open")}</button></div>`:""}</header>
     ${anyAnswer?"":`<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`}${blocks.join("")}
     <div class="row"><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button><button class="btn link" data-act="go" data-to="settings">${t("common.settings")}</button></div>`;
 }
@@ -2547,8 +2643,9 @@ function modItem(it){
 function modBar(m, page, pages){
   const items = modItems(m), done = items.filter(it=>it.id in P.answers).length;
   const pct = items.length ? Math.round(done/items.length*100) : 0;
-  return `<div class="bar"><div class="row"><span>${esc(t("mod.step",{m:t("mod."+m),n:page+1,k:pages}))}</span>
-    <span class="row" style="gap:14px"><button class="stop" data-act="go" data-to="mods">${t("mod.to_list")}</button><button class="stop" data-act="pause">${t("common.stop")}</button></span></div>
+  return `<div class="bar"><div class="row"><button class="back" data-act="mback">← ${t("common.back")}</button>
+    <span class="lbl">${esc(t("mod."+m))}</span>
+    <span class="row" style="gap:12px;flex-wrap:nowrap"><button class="stop" data-act="go" data-to="mods">${t("mod.to_list_short")}</button><button class="stop" data-act="pause" aria-label="${esc(t("common.stop"))}">${t("bar.pause")}</button></span></div>
     <div class="track" aria-hidden="true"><div class="fill" style="width:${pct}%"></div></div></div>`;
 }
 function modIntro(m){
@@ -2583,18 +2680,51 @@ function modGateView(){
     <div class="nav"><button class="btn ghost" data-act="go" data-to="mods">${t("common.back")}</button><button class="btn link" data-act="pause">${t("common.stop")}</button></div>
     <p class="small"><button class="btn link small" data-act="go" data-to="help">${t("common.help")}</button></p>`;
 }
+const M_AUTO = new Set(["yn","ynf","pose","zone","lvl","freq","one"]);   // one tap answers these, so the next question follows
 function modView(){
   const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), items = pages[page];
   const peek = P.modules[m]?.gate==="peek" && !UI.peekMore?.[m];
-  const last = page===pages.length-1;
-  const body = items.length ? `<div class="card list">${items.map(modItem).join("")}</div>` : `<p class="muted">${t("mod.empty")}</p>`;
-  const lvlLead = items.some(it=>it.t==="lvl") ? `<p class="small muted">${t("mod.lvl_hint")}</p>` : "";
-  return modBar(m, page, pages.length) + head(t("mods.lvl."+MOD_LVL[m]), t("mod."+m), page===0?t(MODULES[m].some(it=>it.t==="yn"||it.t==="yn2")?"core.w1.lead":"mod.gate."+m):"") +
-    (page===0 ? modIntro(m) : "") + lvlLead + body +
-    `<div class="nav"><button class="btn ghost" data-act="modback">${t("common.back")}</button><div class="row">
-      ${peek && modItems(m).length>5 ? `<button class="btn ghost" data-act="peekmore">${t("mod.peek_more")}</button>` : ""}
-      <button class="btn" data-act="modnext">${peek?t("mod.peek_stop"):last?t("mod.finish"):t("common.next")}</button></div></div>
-    <p class="small"><button class="btn link small" data-act="go" data-to="help">${t("common.help")}</button></p>`;
+  UI.mi ||= {}; UI.modIntroSeen ||= {};
+  if(!items.length) return modBar(m, page, pages.length) + head(t("mods.lvl."+MOD_LVL[m]), t("mod."+m), "") + `<p class="muted">${t("mod.empty")}</p>
+    <div class="nav"><button class="btn ghost" data-act="go" data-to="mods">${t("mod.to_list")}</button><button class="btn" data-act="modnext">${t("mod.finish")}</button></div>`;
+  if(page===0 && !UI.modIntroSeen[m]){
+    const notes = modIntro(m).replace(/<p class="note">/g,'<div class="msg in new">').replace(/<\/p>/g,"</div>");
+    return modBar(m, page, pages.length) + `<div class="chat" aria-live="polite"><div class="msg title">${t("mod."+m)}</div>
+      <div class="msg in new">${t(MODULES[m].some(it=>it.t==="yn"||it.t==="yn2")?"core.w1.lead":"mod.gate."+m)}</div>${notes}</div>
+      <div class="dock"><button class="btn wide" data-act="modintro">${t("chat.go")}</button></div>`;
+  }
+  const k = m+":"+page, i = Math.max(0, Math.min(items.length-1, UI.mi[k]||0)), it = items[i], id = it.id, v = P.answers[id];
+  const total = pages.reduce((a,p)=>a+p.length,0), pos = pages.slice(0,page).reduce((a,p)=>a+p.length,0)+i+1;
+  const label = it.t==="lvl" ? t("q."+id) : qText(id);
+  const hint = modHint(it), tipKey = itemTip(it);
+  const tip = tipKey ? `<p class="small" style="color:var(--maybe)">${t(tipKey)}</p>` : "";
+  let body;
+  if(it.t==="yn") body = cardHTML(id, label, v, {act:"mans", suit:t("mod."+m), num:pos, left:Math.min(2,total-pos), sub:hint, extra:tip});
+  else body = `<h2 class="lq">${esc(label)}</h2>${hint?`<p class="qhint">${esc(hint)}</p>`:""}
+    ${it.t==="lvl"?`<p class="qhint">${t("mod.lvl_hint")}</p>`:""}<div class="qone">${modItem(it)}</div>
+    ${M_AUTO.has(it.t)?"":`<button class="btn wide" data-act="mstep">${t("common.next")}</button>`}`;
+  const last = page===pages.length-1 && i===items.length-1;
+  return modBar(m, page, pages.length) + `<div class="qpage"><div class="qmeta"><span>${esc(t("mod."+m))}</span><span>${t("q.n_of",{n:pos,k:total})}</span></div>${body}
+    <div class="qfoot"><button data-act="skipq" data-id="${id}">${t("common.skip")}</button>
+    ${peek && modItems(m).length>5 ? `<button data-act="peekmore">${t("mod.peek_more")}</button>` : peek||last ? `<button data-act="modnext" data-whole="1">${peek?t("mod.peek_stop"):t("mod.finish")}</button>` : `<button data-act="go" data-to="help">${t("common.help")}</button>`}</div></div>`;
+}
+function mAdvance(){
+  const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), k = m+":"+page, i = UI.mi[k]||0;
+  if(i < pages[page].length-1){ UI.mi[k] = i+1; save(); render(); window.scrollTo(0,0); return; }
+  modNextPage();
+}
+function mBack(){
+  const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), k = m+":"+page, i = UI.mi[k]||0;
+  if(i > 0){ UI.mi[k] = i-1; save(); render(); window.scrollTo(0,0); return; }
+  if(page > 0){ UI.modPage = page-1; UI.mi[m+":"+(page-1)] = pages[page-1].length-1; return go("mod"); }
+  if(UI.modIntroSeen?.[m]){ UI.modIntroSeen[m] = false; save(); return render(); }
+  go("modgate");
+}
+function modNextPage(){
+  const pages = modPages(UI.mod);
+  if(P.modules[UI.mod]?.gate==="peek" && !UI.peekMore?.[UI.mod]){ save(); return go("mods"); }      // R13: a peek is not a finished module
+  if((UI.modPage||0) < pages.length-1){ UI.modPage = (UI.modPage||0)+1; UI.mi[UI.mod+":"+UI.modPage] = 0; return go("mod"); }
+  P.modules[UI.mod] = {...P.modules[UI.mod], done:true, at:now()}; return go("modres");
 }
 function sideLabel(it, side){ return t("opt.yn2."+it.y+"."+side).toLowerCase(); }
 function modSummary(m){
@@ -2782,14 +2912,28 @@ function inviteView(){
     ${G?.invite?.sent_at ? `<section class="card"><h3>${t("myguess.step")}</h3><p class="small muted">${t("myguess.step_lead")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="myguess">${t("myguess.btn")}</button></div></section>` : ""}
     <div class="row"><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title")}</button><button class="btn link" data-act="go" data-to="result">${t("common.to_result")}</button></div>`;
 }
+// guess games: one card at a time, then a short wrap-up before the result
+function deckPage(key, ids_, vals, act, {title, eyebrow, lead, done, doneLabel, locked=false}){
+  UI.deck ||= {};
+  const i = UI.deck[key] ?? 0;
+  if(locked || i >= ids_.length){
+    const n = ids_.filter(id=>vals[id]!==undefined).length;
+    return `<div class="chat"><div class="msg title">${title}</div><div class="msg in new">${t("deck.done",{n,k:ids_.length})}</div></div>
+      <div class="dock">${locked?"":`<div class="row"><button class="chip" data-act="deckgo" data-key="${key}" data-i="0">${t("deck.again")}</button></div>`}${done}</div>`;
+  }
+  const id = ids_[i];
+  return `<div class="bar"><div class="row"><button class="back" data-act="deckgo" data-key="${key}" data-i="${i-1}" ${i?"":"disabled"}>← ${t("common.back")}</button>
+    <span class="lbl">${esc(eyebrow)}</span><button class="stop" data-act="pause" aria-label="${esc(t("common.stop"))}">${t("bar.pause")}</button></div>
+    <div class="track" aria-hidden="true"><div class="fill" style="width:${Math.round(i/ids_.length*100)}%"></div></div></div>
+    <div class="qpage"><div class="qmeta"><span>${esc(title)}</span><span>${t("q.n_of",{n:i+1,k:ids_.length})}</span></div>
+    ${i===0&&lead?`<p class="qhint">${esc(lead)}</p>`:""}
+    ${cardHTML(id, qText(id), vals[id], {act, suit:lead?"":title, num:i+1, left:ids_.length-1-i, dunno:true}).replaceAll(`data-one="1"`,`data-one="1" data-deck="${key}"`)}
+    <div class="qfoot"><button data-act="deckgo" data-key="${key}" data-i="${ids_.length}">${doneLabel}</button><button data-act="go" data-to="help">${t("common.help")}</button></div></div>`;
+}
 function guessView(){
   const key = G?.guess_key || {}, ids_ = Object.keys(key), g = G.guess.b_about_a;
-  const rows = ids_.map(id=>{ const v = g[id];
-    return `<div class="item"><p class="q">${esc(ITEM[id]?qText(id):qText(id))}</p><div class="ans"><div class="seg" role="group" aria-label="${esc(qText(id))}">
-      ${[[2,"yes",""],[1,"maybe","m"],[0,"no","n"]].map(([val,k,c])=>`<button class="${c}" aria-pressed="${v===val}" data-act="guess" data-id="${id}" data-val="${val}">${t("opt.yn."+k)}</button>`).join("")}</div>
-      <button class="skip" aria-pressed="${v===null}" data-act="guess" data-id="${id}" data-val="x">${t("guess.dunno")}</button></div></div>`; }).join("");
-  return head(t("guess.eyebrow"), t("guess.title"), t("guess.lead")) + `<div class="card list">${rows}</div>
-    <div class="nav"><button class="btn link" data-act="pause">${t("common.stop")}</button><button class="btn" data-act="go" data-to="guessres">${t("guess.done")}</button></div>`;
+  return deckPage("guess", ids_, g, "guess", {title:t("guess.title"), eyebrow:t("guess.eyebrow"), lead:t("guess.lead"), doneLabel:t("guess.done"),
+    done:`<button class="btn wide" data-act="go" data-to="guessres">${t("guess.done")}</button>`});
 }
 function guessResView(){
   const key = G?.guess_key || {}, g = G.guess.b_about_a;
@@ -2874,7 +3018,9 @@ function pairView(){
       const few = p.l1>=0.8 && l1Share()>=0.8 && R.l1<5 ? hintBox("pair_few") : "";
       const waiting = MODS.filter(m=>modDone(m) && !p.mods.includes(m));
       const todo = `<section class="card"><h3>${t("pair.todo")}</h3><p class="small muted">${t("pair.todo_lead")}</p><div class="row"><button class="btn" data-act="go" data-to="plan">${t("plan.open")}</button><button class="btn ghost" data-act="go" data-to="ideas">${t("idea.open")}</button></div></section>`;
-      compare = `<p class="note">${t("pair.private")}</p>${todo}${few}${secHtml||`<p class="muted">${t("pair.none")}</p>`}${talk}${style}${brakes}
+      const nY = R.sections.reduce((a,x)=>a+x.yes.length+x.lines.filter(l=>l.c!=="maybe").length,0), nM = R.sections.reduce((a,x)=>a+x.maybe.length+x.lines.filter(l=>l.c==="maybe").length,0);
+      const hero = `<div class="pairhero"><b>${nY}</b><span>${t("pair.hero",{n:nY})}</span>${nM?`<span class="muted">${t("pair.hero_m",{n:nM})}</span>`:""}</div>`;
+      compare = `${hero}<p class="note">${t("pair.private")}</p>${todo}${few}${secHtml||`<p class="muted">${t("pair.none")}</p>`}${talk}${style}${brakes}
         ${waiting.length?`<p class="small muted">${t("pair.waiting")}: ${waiting.map(m=>t("mod."+m)).join(", ")}</p>`:""}<p class="small muted">${t("pair.more")}</p>`;
     }
   }
@@ -3152,14 +3298,11 @@ function myGuessIds(){ const q = partnerQ(); if(q) return Object.keys(q); return
 function myGuessView(){
   ensureGroup();
   const ids_ = myGuessIds(), g = G.guess.a_about_b, done = !!G.guess.a_seen, q = partnerQ();
-  const rows = ids_.map(id=>{ const v = g[id];
-    return `<div class="item"><p class="q">${esc(qText(id))}</p><div class="ans"><div class="seg" role="group" aria-label="${esc(qText(id))}">
-      ${[[2,"yes",""],[1,"maybe","m"],[0,"no","n"]].map(([val,k,c])=>`<button class="${c}" aria-pressed="${v===val}" ${done?"disabled":""} data-act="myguess" data-id="${id}" data-val="${val}">${t("opt.yn."+k)}</button>`).join("")}</div>
-      <button class="skip" aria-pressed="${v===null}" ${done?"disabled":""} data-act="myguess" data-id="${id}" data-val="x">${t("guess.dunno")}</button></div></div>`; }).join("");
-  const nav = q ? `<div class="nav"><button class="btn link" data-act="go" data-to="pair">${t("pair.title_with")}</button><button class="btn" data-act="myguessdone">${done?t("myguess.see"):t("guess.done")}</button></div>`
-    : `<p class="note">${G.partner ? t("myguess.no_q") : t("myguess.wait")}</p><div class="row"><button class="btn" data-act="go" data-to="${G.partner?"pair":"invite"}">${t("myguess.save_exit")}</button></div>`;
-  return head(t("guess.eyebrow"), t("myguess.title"), q ? (done ? t("myguess.lead_done") : t("myguess.lead_ready")) : t("myguess.lead_wait")) +
-    (ids_.length ? `<div class="card list">${rows}</div>` : `<p class="muted">${t("inv.none")}</p>`) + nav;
+  const lead = q ? (done ? t("myguess.lead_done") : t("myguess.lead_ready")) : t("myguess.lead_wait");
+  const finish = q ? `<button class="btn wide" data-act="myguessdone">${done?t("myguess.see"):t("guess.done")}</button><div class="row"><button class="btn link" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`
+    : `<p class="note">${G.partner ? t("myguess.no_q") : t("myguess.wait")}</p><button class="btn wide" data-act="go" data-to="${G.partner?"pair":"invite"}">${t("myguess.save_exit")}</button>`;
+  if(!ids_.length) return head(t("guess.eyebrow"), t("myguess.title"), lead) + `<p class="muted">${t("inv.none")}</p>` + finish;
+  return deckPage("myguess", ids_, g, "myguess", {title:t("myguess.title"), eyebrow:t("guess.eyebrow"), lead, doneLabel:t("guess.done"), done:finish, locked:done});
 }
 function myGuessResView(){
   const key = partnerQ(); if(!key || !G.guess.a_seen) return myGuessView();
@@ -3277,6 +3420,7 @@ app.addEventListener("click", async e=>{
       save(); return rerender();
     }
     case "skipq": { const id=b.dataset.id;   // R17
+      if(UI.screen==="mod"){ P.answers[id]=null; save(); return mAdvance(); }
       if(SCR[UI.screen]?.kind==="items"){ P.answers[id]=null; save(); return qAdvance(); }
       if(P.answers[id]===null) delete P.answers[id]; else P.answers[id]=null; save(); return rerender(); }
     case "qback": return qBack();
@@ -3334,7 +3478,7 @@ app.addEventListener("click", async e=>{
     case "importno": pendingImport = null; return rerender();
     /* modules */
     case "openmod": {
-      const m = b.dataset.m; UI.mod = m; UI.modPage = 0;
+      const m = b.dataset.m; UI.mod = m; UI.modPage = 0; UI.mi = {...(UI.mi||{}), [m+":0"]:0};
       if(m==="zones") prefillZones();
       if(!P.modules[m]?.gate || (P.modules[m].gate==="skip" && !b.dataset.edit)) return go("modgate");
       if(b.dataset.edit && P.modules[m].gate==="skip") return go("modgate");
@@ -3350,8 +3494,13 @@ app.addEventListener("click", async e=>{
       const id=b.dataset.id, side=b.dataset.side, raw=b.dataset.val, val = b.dataset.kind==="s" || !/^\d$/.test(raw) ? raw : Number(raw);
       if(side){ const k = side==="a"?"give":"get"; const cur = (P.answers[id] && typeof P.answers[id]==="object") ? {...P.answers[id]} : {};
         cur[k] = cur[k]===val ? null : val; if(cur.give==null && cur.get==null) delete P.answers[id]; else P.answers[id] = cur; }
-      else if(P.answers[id]===val) delete P.answers[id]; else P.answers[id]=val;
-      save(); return rerender();
+      else if(P.answers[id]===val && UI.screen!=="mod") delete P.answers[id]; else P.answers[id]=val;
+      save();
+      if(UI.screen==="mod"){ const it = ITEM[id];
+        if(side){ const sides=["a","b"].filter(x=>colOk(it,x,stopSet())), cur=P.answers[id]||{}; if(sides.every(x=>cur[x==="a"?"give":"get"]!=null)) return setTimeout(mAdvance, 200); return rerender(); }
+        if(M_AUTO.has(it.t) && !(id==="power.stopword" && val==="what")) return setTimeout(mAdvance, b.dataset.one ? 0 : 200);
+      }
+      return rerender();
     }
     case "mmulti": {
       const id=b.dataset.id, val=b.dataset.val, ex=b.dataset.ex?b.dataset.ex.split(","):[];
@@ -3360,7 +3509,13 @@ app.addEventListener("click", async e=>{
       if(arr.length) P.answers[id] = arr; else delete P.answers[id];
       save(); return rerender();
     }
+    case "modintro": UI.modIntroSeen[UI.mod] = true; UI.mi[UI.mod+":0"] = 0; save(); render(); window.scrollTo(0,0); return;
+    case "mstep": return mAdvance();
+    case "mback": return mBack();
+    case "deckgo": { UI.deck ||= {}; UI.deck[b.dataset.key] = Math.max(0, Number(b.dataset.i)); save(); render(); window.scrollTo(0,0); return; }
+    case "storygo": { const n = Number(b.dataset.i); if(n<0) return; UI.storyI = n; if(b.dataset.open) return go("story"); save(); return render(); }
     case "modnext": {
+      if(b.dataset.whole) return modNextPage();
       const pages = modPages(UI.mod);
       if(P.modules[UI.mod]?.gate==="peek" && !UI.peekMore?.[UI.mod]){ save(); return go("mods"); }      // R13: a peek is not a finished module
       if((UI.modPage||0) < pages.length-1){ UI.modPage = (UI.modPage||0)+1; return go("mod"); }
@@ -3378,7 +3533,9 @@ app.addEventListener("click", async e=>{
       try{ await navigator.clipboard.writeText(text); toast(t("inv.copied")); }catch(err){ toast("Скопируй вручную"); }
       return rerender();
     }
-    case "guess": { const id=b.dataset.id, v=b.dataset.val==="x"?null:Number(b.dataset.val); G.guess.b_about_a[id] = G.guess.b_about_a[id]===v ? undefined : v; saveGroup(); return rerender(); }
+    case "guess": { const id=b.dataset.id, v=b.dataset.val==="x"?null:Number(b.dataset.val);
+      if(b.dataset.deck){ G.guess.b_about_a[id] = v; saveGroup(); UI.deck[b.dataset.deck] = (UI.deck[b.dataset.deck]||0)+1; save(); render(); window.scrollTo(0,0); return; }
+      G.guess.b_about_a[id] = G.guess.b_about_a[id]===v ? undefined : v; saveGroup(); return rerender(); }
     case "guessopen": UI.guessOpen = {...(UI.guessOpen||{}), [b.dataset.id]:true}; return rerender();
     /* pair */
     case "pairimport": {
@@ -3402,7 +3559,9 @@ app.addEventListener("click", async e=>{
       UI.planCopyAsk = false;
       try{ await navigator.clipboard.writeText(text); toast(t("plan.copied")); }catch(err){ toast(t("plan.copy_fail")); } return rerender(); }
     case "plancopyno": UI.planCopyAsk = false; return rerender();
-    case "myguess": { if(G.guess.a_seen) return; const id=b.dataset.id, v=b.dataset.val==="x"?null:Number(b.dataset.val); G.guess.a_about_b[id] = G.guess.a_about_b[id]===v ? undefined : v; saveGroup(); return rerender(); }
+    case "myguess": { if(G.guess.a_seen) return; const id=b.dataset.id, v=b.dataset.val==="x"?null:Number(b.dataset.val);
+      if(b.dataset.deck){ G.guess.a_about_b[id] = v; saveGroup(); UI.deck[b.dataset.deck] = (UI.deck[b.dataset.deck]||0)+1; save(); render(); window.scrollTo(0,0); return; }
+      G.guess.a_about_b[id] = G.guess.a_about_b[id]===v ? undefined : v; saveGroup(); return rerender(); }
     case "myguessdone": if(partnerQ()){ G.guess.a_seen = true; saveGroup(); return go("myguessres"); } return rerender();
     case "revsel": { const id=b.dataset.id, s=revealSel(); G.reveal_sel = s.includes(id) ? s.filter(x=>x!==id) : s.length>=15 ? s : [...s,id]; if(!G.reveal_sel.length) G.reveal_on = false; saveGroup(); return rerender(); }
     case "revon": G.reveal_on = !G.reveal_on; saveGroup(); return rerender();
