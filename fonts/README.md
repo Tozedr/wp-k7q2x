@@ -1,0 +1,1 @@
+Шрифты лежат локально, чтобы приложение не обращалось к Google Fonts: Cormorant Garamond и Golos Text, лицензия SIL Open Font License 1.1 (https://openfontlicense.org). Только наборы cyrillic и latin.
