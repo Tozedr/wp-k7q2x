@@ -95,6 +95,7 @@ header.screen{padding-top:18px;display:grid;gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:44px;padding:9px 16px;border-radius:999px;border:1px solid #4A2F3B;background:#1E1218;font-size:15px;text-align:left}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.chip[aria-pressed="true"] .muted{color:var(--accent-ink);opacity:.75}
 .chip .soon{font-size:12px;color:var(--muted);margin-left:6px}
 input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 textarea{min-height:120px;font-size:13px;word-break:break-all}
@@ -215,6 +216,8 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .brk{display:grid;gap:6px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--fg);color:#1A0F14;padding:10px 16px;border-radius:14px;font-size:14px;z-index:20;max-width:90%}
 .steps-list{display:grid;gap:6px}
+.steps-list button span.small{white-space:nowrap}
+.steps-list button span:first-child{min-width:0}
 .steps-list button{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:48px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);text-align:left}
 .pin{display:flex;gap:10px;align-items:center}
 .pin input{max-width:10em;letter-spacing:.3em;font-variant-numeric:tabular-nums}
@@ -234,6 +237,38 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
 .qone .skip{display:none}
 /* stories */
 /* pair */
+/* shared frame outside the question flow: the same top bar, a body, a solid dock with the main action */
+.wrap:has(> .dock) > .dock{align-self:end}
+body:has(.dock){padding-bottom:0}
+.wrap:has(> .dock){min-height:100svh}
+.bar.plain{padding-bottom:4px}
+.bar.plain .row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px}
+.bar.plain .row>.back{justify-self:start}
+.bar.plain .row>.rt,.bar.plain .row>.sp{justify-self:end;white-space:nowrap}
+.bar .lbl{min-width:0}
+.bar{margin-inline:calc(-1 * max(18px, env(safe-area-inset-left, 0px)));padding-inline:max(18px, env(safe-area-inset-left, 0px))}
+.pg{display:grid;gap:18px;align-content:start;min-width:0}
+.pg>header.screen{padding-top:6px}
+.dock .dsub{justify-content:center;gap:4px 18px}
+.dock .dsub .btn.link{color:var(--muted);font-size:14px}
+.dock .pin{justify-content:flex-end}
+.dock .pin input{max-width:none;flex:1}
+.err{color:var(--maybe)!important;font-size:14px}
+.checks .check{background:var(--surface)}
+.msg b{font-weight:600}
+.msg .sm,.msg.in .muted{font-size:14px}
+.msg .sm{display:block;color:var(--muted);margin-top:4px}
+/* topic tiles: one deck per level */
+.tiles{display:grid;gap:8px}
+.tile{display:grid;grid-template-columns:6px 1fr auto;gap:14px;align-items:center;padding:12px 14px 12px 12px;border-radius:20px;background:var(--surface);border:1px solid rgba(255,255,255,.06);text-align:left;min-height:64px}
+.tile::before{content:"";align-self:stretch;border-radius:4px;background:var(--card-grad);opacity:.55}
+.tile.l2::before{opacity:.8}.tile.l3::before{opacity:1;background:linear-gradient(180deg,#E3789D,#8E2F55)}
+.tile .tl{display:grid;gap:2px;min-width:0}
+.tile b{font-weight:600}
+.tile .st{font-size:12px;color:var(--muted);white-space:nowrap;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+.tile .st.done{color:var(--accent);border-color:rgba(227,120,157,.45);background:var(--yes-bg)}
+.tile .st.started{color:var(--maybe);border-color:rgba(227,178,90,.4)}
+.tiles-h{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
 .pairhero{display:grid;gap:2px;justify-items:center;text-align:center;padding:10px 0 4px}
 .pairhero b{font-family:var(--display);font-size:72px;line-height:1;font-weight:600;color:var(--accent)}
 .pairhero span{font-size:15px}
@@ -1675,7 +1710,9 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "deck.again": "Пройти карты заново",
   "mod.to_list_short": "Темы",
   "pair.hero": "общих «да»",
-  "pair.hero_m": "и ещё {n} «может» — повод поговорить"
+  "pair.hero_m": "и ещё {n} «может» — повод поговорить",
+  "bar.prestart": "Перед стартом",
+  "link.bad": "Ссылка не открылась: похоже, она обрезалась при копировании. Попроси прислать её ещё раз."
 }
 </script>
 
@@ -1948,7 +1985,7 @@ function navRow(nextLabel, opts={}){
 function getPath(path){ return path.split(".").reduce((o,k)=>o?.[k],P); }
 function setPath(path,val){ const ks=path.split("."); let o=P; ks.slice(0,-1).forEach(k=>o=o[k]); o[ks.at(-1)]=val; }
 // one / multi chip group bound to a profile field
-function choice(path, optKey, opts, {multi=false, exclusive=[], hint=null, disabled=[], label=null}={}){
+function choice(path, optKey, opts, {multi=false, exclusive=[], hint=null, disabled=[], label=null, bare=false}={}){
   const v = getPath(path);
   const chips = opts.map(o=>{
     const on = multi ? (v||[]).includes(o) : v===o;
@@ -1956,6 +1993,7 @@ function choice(path, optKey, opts, {multi=false, exclusive=[], hint=null, disab
     return `<button class="chip" aria-pressed="${on}" ${dis?"disabled":""} data-act="${multi?"multi":"one"}" data-path="${path}" data-val="${o}" data-ex="${exclusive.join(",")}">${esc(t(`opt.${optKey}.${o}`))}${dis?`<span class="soon">${t("common.soon")}</span>`:""}</button>`;
   }).join("");
   const hk = "q."+path+".hint";
+  if(bare) return `<div class="chips">${chips}</div>`;
   return `<div class="field"><p class="q">${esc(label||t("q."+path))}</p>${hint||RU[hk]?`<p class="small muted">${esc(hint||t(hk))}</p>`:""}<div class="chips">${chips}</div></div>`;
 }
 const uiField = path => path==="relationship.partner_name";   // stored in UI, not in the profile
@@ -1983,6 +2021,21 @@ function item(id, type){
 function head(eyebrow, title, lead){
   return `<header class="screen">${eyebrow?`<p class="eyebrow">${esc(eyebrow)}</p>`:""}<h2>${title}</h2>${lead?`<p class="muted">${lead}</p>`:""}</header>`;
 }
+/* one frame for every screen outside the questions (docs/design-guide.md): top bar with «Назад», one body, a solid dock at the thumb */
+function topBar(label, {to=null, act="back", attrs="", right="", noBack=false}={}){
+  const b = noBack ? `<span class="sp"></span>` : `<button class="back" data-act="${to?"go":act}"${to?` data-to="${esc(to)}"`:""} ${attrs}>← ${t("common.back")}</button>`;
+  return `<div class="bar plain"><div class="row">${b}<span class="lbl">${esc(label||"")}</span>${right?`<span class="rt">${right}</span>`:`<span class="sp"></span>`}</div></div>`;
+}
+const barLink = (to, label) => `<button class="stop" data-act="go" data-to="${to}">${label}</button>`;
+const barPause = () => `<button class="stop" data-act="pause" aria-label="${esc(t("common.stop"))}">${t("bar.pause")}</button>`;
+function dock(main, sub=""){ return `<div class="dock">${main}${sub?`<div class="row dsub">${sub}</div>`:""}</div>`; }
+const dockBtn = (act, label, attrs="", ghost=false) => `<button class="btn wide${ghost?" ghost":""}" data-act="${act}" ${attrs}>${label}</button>`;
+const goBtn = (to, label, ghost=false) => dockBtn("go", label, `data-to="${esc(to)}"`, ghost);
+const subLink = (to, label) => `<button class="btn link small" data-act="go" data-to="${esc(to)}">${label}</button>`;
+const helpLink = () => subLink("help", t("common.help"));
+function hostChat(title, msgs){ return `<div class="chat" aria-live="polite">${title?`<div class="msg title">${title}</div>`:""}${msgs.filter(Boolean).map(m=>`<div class="msg in new">${m}</div>`).join("")}</div>`; }
+const pg = html => `<div class="pg">${html}</div>`;
+const sendNext = (act="next") => `<div class="cbar"><span></span><button class="send" data-act="${act}" aria-label="${t("chat.send")}">${SEND_ICON}</button></div>`;
 
 /* ---------- screens ---------- */
 const VIEWS = {
@@ -2002,36 +2055,37 @@ const VIEWS = {
     const on = k => !!(d[k] ?? (k==="age"?c.age18:k==="terms"?c.terms===TERMS_VERSION:k==="data"?c.data:c.not_diagnosis));
     const box = (k,label,hint)=>`<button class="check" role="checkbox" aria-checked="${on(k)}" data-act="term" data-k="${k}"><span class="box"></span><span>${label}${hint?`<br><span class="small muted">${hint}</span>`:""}</span></button>`;
     const all = on("age")&&on("terms")&&on("data")&&on("diag");
-    return head("Перед стартом", t("t.title"), t("t.lead")) +
-      `<div class="stack">${box("age",t("t.age"))}${box("terms",t("t.terms"),t("t.terms_hint"))}${box("data",t("t.data"),t("t.data_hint"))}${box("diag",t("t.diag"))}</div>
-      <p class="small"><button class="btn link small" data-act="go" data-to="docs">${t("t.read")}</button></p>
-      <div class="nav"><button class="btn ghost" data-act="go" data-to="under18">${t("t.under")}</button><button class="btn" data-act="accept" ${all?"":"disabled"}>${t("common.next")}</button></div>`;
+    return topBar(t("bar.prestart"), {to:"welcome"}) + pg(hostChat(t("t.title"), [t("t.lead")]) +
+      `<div class="stack checks">${box("age",t("t.age"))}${box("terms",t("t.terms"),t("t.terms_hint"))}${box("data",t("t.data"),t("t.data_hint"))}${box("diag",t("t.diag"))}</div>
+      <p class="small"><button class="btn link small" data-act="go" data-to="docs">${t("t.read")}</button></p>`) +
+      dock(dockBtn("accept", t("common.next"), all?"":"disabled"), subLink("under18", t("t.under")));
   },
   intro(){   // spec 0.1 + sexologist review #29: what kind of questions lie ahead, before anything personal
-    const st = k => `<div class="field"><p class="q">${t("i."+k+".t")}</p><p class="muted">${t("i."+k)}</p></div>`;
-    return head("Перед стартом", t("i.title"), t("i.lead")) + `<div class="card stack">${st("s1")}${st("s2")}${st("s3")}</div>
-      <div class="stack"><p>${t("i.skip")}</p><p class="muted">${t("i.hard")}</p></div>` + navRow();
+    const st = k => `<b>${t("i."+k+".t")}</b><span class="sm">${t("i."+k)}</span>`;
+    return topBar(t("bar.prestart")) + hostChat(t("i.title"), [t("i.lead"), st("s1"), st("s2"), st("s3"), t("i.skip"), `<span class="muted">${t("i.hard")}</span>`]) +
+      dock(dockBtn("next", t("common.next")), helpLink());
   },
   under18(){
-    return head("", t("u.title"), "") + `<p>${t("u.text")}</p>${lsGet(STORE_KEY)?`<p class="small muted">${t("u.saved")}</p>`:""}
-      <div class="row"><button class="btn ghost" data-act="go" data-to="terms">${t("u.back")}</button></div>`;
+    return topBar("", {to:"terms"}) + hostChat(t("u.title"), [t("u.text"), lsGet(STORE_KEY)?`<span class="muted">${t("u.saved")}</span>`:""]) +
+      dock(goBtn("terms", t("u.back")));
   },
   docs(){
     const sec = ["what","notmed","rules","who","data","consent","where","share","rights","complaint","liability","changes","contact"].map(k=>`<section class="stack"><h3>${t("doc."+k+".t")}</h3><p>${t("doc."+k)}</p></section>`).join("");
-    return head("", t("doc.title"), "") + `<p class="note">${t("doc.draft")}</p><div class="card">${sec}</div>
-      <div class="row"><button class="btn" data-act="go" data-to="${esc(UI.docsFrom||"terms")}">${t("doc.back")}</button></div>`;
+    return topBar("", {to:UI.docsFrom||"terms"}) + pg(head("", t("doc.title"), "") + `<p class="note">${t("doc.draft")}</p><div class="card">${sec}</div>`) +
+      dock(goBtn(UI.docsFrom||"terms", t("doc.back")));
   },
   lang(){
-    return head("Перед стартом", t("l.title"), "") + `<div class="card">${choice("locale","lang",["ru","uk","pl","en"],{label:t("l.q"),disabled:["uk","pl","en"]})}<p class="small muted">${t("l.note")}</p></div>` + navRow();
+    return topBar(t("bar.prestart")) + hostChat(t("l.title"), [t("l.q"), `<span class="muted">${t("l.note")}</span>`]) +
+      dock(choice("locale","lang",["ru","uk","pl","en"],{disabled:["uk","pl","en"], bare:true}) + sendNext());
   },
   storage(){
-    return head("Перед стартом", t("s.title"), "") + `<div class="card">
-      <div class="chips"><button class="chip" aria-pressed="true">${t("s.device")}</button><button class="chip" disabled>${t("s.cloud")}<span class="soon">${t("common.soon")}</span></button></div>
-      <p class="note">${t("s.device_warn")}</p><p class="small muted">${t("s.cloud_note")}</p></div>` + navRow();
+    return topBar(t("bar.prestart")) + hostChat(t("s.title"), [t("s.device_warn"), `<span class="muted">${t("s.cloud_note")}</span>`]) +
+      dock(`<div class="chips"><button class="chip" aria-pressed="true">${t("s.device")}</button><button class="chip" disabled>${t("s.cloud")}<span class="soon">${t("common.soon")}</span></button></div>` + sendNext());
   },
   pin(){
-    return head("Перед стартом", t("p.title"), t("p.lead")) + `<div class="card">${pinSetter()}</div>
-      <div class="nav"><button class="btn ghost" data-act="back">${t("common.back")}</button><button class="btn" data-act="next">${t("p.later")}</button></div>`;
+    return topBar(t("bar.prestart")) + hostChat(t("p.title"), [t("p.lead")]) +
+      dock(`<div class="cbar"><input type="password" inputmode="numeric" id="pin-new" maxlength="8" placeholder="${t("p.placeholder")}" autocomplete="off" enterkeyhint="send" aria-label="${esc(t("p.set"))}">
+        <button class="send" data-act="setpin" aria-label="${esc(t("p.set"))}">${SEND_ICON}</button></div><p class="err" id="pin-msg" role="alert"></p>`, `<button class="btn link small" data-act="next">${t("p.later")}</button>`);
   },
   identity(){ return chatForm("identity"); },
   body_early(){ return chatForm("body_early"); },
@@ -2041,12 +2095,12 @@ const VIEWS = {
   result(){ return resultView(); },
   pause(){
     const again = UI.pauseAgain;
-    return head("", t("pause.title"), t("pause.text")) + `${again?`<div class="flag"><p>${t("pause.again")}</p><div class="row"><button class="btn ghost" data-act="skipfrom">${t("pause.skip_block")}</button><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button></div></div>`:""}
-      <div class="row"><button class="btn" data-act="go" data-to="${esc(UI.pausedAt||"welcome")}">${t("pause.back")}</button></div>`;
+    return topBar(t("bar.pause"), {to:UI.pausedAt||"welcome"}) + hostChat(t("pause.title"), [t("pause.text"), again?t("pause.again"):""]) +
+      dock((again?dockBtn("skipfrom", t("pause.skip_block"), "", true):"") + goBtn(UI.pausedAt||"welcome", t("pause.back")), again?helpLink():"");
   },
   help(){
-    return head("", t("help.title"), "") + `<div class="stack"><p>${t("help.text")}</p><p>${t("help.spec")}</p><p>${t("help.violence")}</p><p class="note">${t("help.stub")}</p></div>
-      <div class="row"><button class="btn" data-act="go" data-to="${esc(UI.helpFrom||"welcome")}">${t("pause.back")}</button></div>`;
+    return topBar("", {to:UI.helpFrom||"welcome"}) + hostChat(t("help.title"), [t("help.text"), t("help.spec"), t("help.violence"), `<span class="muted">${t("help.stub")}</span>`]) +
+      dock(goBtn(UI.helpFrom||"welcome", t("pause.back")));
   },
   settings(){ return settingsView(); },
   mods(){ return modsView(); },
@@ -2063,10 +2117,10 @@ const VIEWS = {
   myguess(){ return myGuessView(); },
   myguessres(){ return myGuessResView(); },
   lock(){
-    return `<header class="screen" style="padding-top:44px"><h1>${t("w.title")}</h1></header><div class="card"><label class="q" for="pin-in">${t("p.lock_title")}</label>
-      <div class="pin"><input type="password" inputmode="numeric" id="pin-in" maxlength="8" autocomplete="off"><button class="btn" data-act="unlock">${t("p.unlock")}</button></div>
-      <p class="small muted" id="pin-msg"></p></div><p class="small"><button class="btn link small" data-act="pinreset">${t("p.forgot")}</button></p>
-      ${UI.pinResetAsk?`<div class="flag"><p>${t("set.delete_lead")}</p><button class="btn" data-act="wipe">${t("set.delete_confirm")}</button></div>`:""}`;
+    return topBar("", {noBack:true}) + `<div class="pg"><div class="hero" style="padding-top:12px"><h1>${t("w.title")}</h1></div>${hostChat("", [`<label for="pin-in">${t("p.lock_title")}</label>`, UI.pinResetAsk?t("set.delete_lead"):""])}</div>` +
+      dock(UI.pinResetAsk ? dockBtn("wipe", t("set.delete_confirm"), "", true) :
+        `<div class="cbar"><input type="password" inputmode="numeric" id="pin-in" maxlength="8" autocomplete="off" enterkeyhint="go" placeholder="${t("p.placeholder")}" aria-label="${esc(t("p.lock_title"))}"><button class="send" data-act="unlock" aria-label="${esc(t("p.unlock"))}">${SEND_ICON}</button></div><p class="err" id="pin-msg" role="alert"></p>`,
+        UI.pinResetAsk ? `<button class="btn link small" data-act="pinresetno">${t("set.import_no")}</button>` : `<button class="btn link small" data-act="pinreset">${t("p.forgot")}</button>`);
   }
 };
 function visItems(s){ return s.items.filter(itemVisible); }
@@ -2160,7 +2214,7 @@ function hiddenTopicsField(){
 }
 function pinSetter(){
   return `<label class="q" for="pin-new">${t("p.set")}</label><div class="pin"><input type="password" inputmode="numeric" id="pin-new" maxlength="8" placeholder="${t("p.placeholder")}" autocomplete="off">
-    <button class="btn ghost" data-act="setpin">${t("p.set")}</button></div><p class="small muted" id="pin-msg"></p>`;
+    <button class="btn ghost" data-act="setpin">${t("p.set")}</button></div><p class="err" id="pin-msg" role="alert"></p>`;
 }
 
 
@@ -2359,7 +2413,7 @@ function resultView(){
   // next
   const {top, later} = recommendModules();
   blocks.push(`<section class="card res"><h3>${t("r.next")}</h3><p class="muted">${t("r.next.lead")}</p>
-    <div class="mods">${top.map(m=>`<button class="mod" style="text-align:left" data-act="openmod" data-m="${m}"><b>${t("mod."+m)}</b><span class="small muted">${t("mod.d."+m)}</span><span class="small muted">${t("mods.st."+modState(m))}</span></button>`).join("")}</div>
+    <div class="tiles">${top.map(modTile).join("")}</div>
     ${later.length?`<p class="small muted">${t("r.next.later")}: ${later.map(m=>t("mod."+m)).join(", ")}</p>`:""}
     <div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("r.next.all")}</button></div></section>`);
 
@@ -2390,10 +2444,11 @@ function resultView(){
     ${UI.showPrompt?`<p class="note">${t("r.tools.prompt_warn")}</p><textarea id="prompt-ta" readonly style="word-break:normal">${esc(llmPrompt())}</textarea><div class="row"><button class="btn" data-act="copy" data-src="prompt-ta">${t("common.copy")}</button></div>`:""}</section>`);
 
   const name = P.identity.name ? esc(P.identity.name) : "";
-  return `<header class="screen" style="padding-top:32px"><p class="eyebrow">${name||t("app.name")}</p><h2 style="font-size:40px">${t("r.title")}</h2>
+  const main = G?.partner ? goBtn("pair", t("r.pair.open")) : hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only" && !G?.invite?.sent_at ? goBtn("invite", t("r.invite.open")) : goBtn("mods", t("r.next.all"));
+  return topBar(name||t("app.name"), {to:"welcome", right:barLink("settings", t("common.settings"))}) + `<div class="pg"><header class="screen"><h2 style="font-size:44px">${t("r.title")}</h2>
     <p class="note">${t("r.disclaimer")}</p></header>
-    ${anyAnswer?"":`<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`}${blocks.join("")}
-    <div class="row"><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button><button class="btn link" data-act="go" data-to="settings">${t("common.settings")}</button></div>`;
+    ${anyAnswer?"":`<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`}${blocks.join("")}</div>` +
+    dock(main, helpLink());
 }
 function llmPrompt(){
   neutralPartner = true;
@@ -2466,7 +2521,8 @@ function profileCode(){
 function settingsView(){
   const stepBtns = SCREENS.filter(s=>s.step && !s.extra && screenVisible(s)).map(s=>`<button data-act="go" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t({identity:"id.title",body_early:"be.title",orient:"or.title",rel:"rel.title"}[s.id])}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("")
     + (P.modules.core_explicit||UI.extraFlow ? SCREENS.filter(s=>s.extra).map(s=>`<button data-act="goextra" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t("bl.title")}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("") : "");
-  return head("", t("set.title"), "") + `
+  const home = UI.resultSeen ? "result" : (UI.settingsFrom||"welcome");
+  return topBar("", {to:home}) + `<div class="pg">${head("", t("set.title"), "")}
     <section class="card"><h3>${t("set.steps")}</h3><div class="steps-list">${stepBtns}</div></section>
     <section class="card"><h3>${t("set.modules")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("mods.all")}</button></div></section>
     <section class="card">${hiddenTopicsField()}</section>
@@ -2478,13 +2534,13 @@ function settingsView(){
     <section class="card"><h3>${t("set.code")}</h3><p class="small muted">${t("set.code_lead")}</p><p class="note">${t("r.tools.code_warn")}</p>
       <textarea id="code-ta" readonly>${esc(profileCode())}</textarea><div class="row"><button class="btn ghost" data-act="copy" data-src="code-ta">${t("common.copy")}</button></div>
       <label class="q" for="import-ta">${t("set.import")}</label><textarea id="import-ta" placeholder="${t("set.import_ph")}"></textarea>
-      <div class="row"><button class="btn ghost" data-act="import">${t("set.import_btn")}</button><span class="small muted" id="import-msg"></span></div>
+      <div class="row"><button class="btn ghost" data-act="import">${t("set.import_btn")}</button><span class="err" id="import-msg" role="alert"></span></div>
       ${pendingImport?`<div class="flag"><p>${t("set.import_confirm")}</p><div class="row"><button class="btn" data-act="importyes">${t("set.import_yes")}</button><button class="btn ghost" data-act="importno">${t("set.import_no")}</button></div></div>`:""}
       <details><summary class="small muted">${t("set.json")}</summary><textarea id="json-ta" readonly style="min-height:220px">${esc(JSON.stringify(P,null,2))}</textarea></details></section>
     <section class="card"><h3>${t("doc.title")}</h3><div class="row"><button class="btn link" data-act="go" data-to="docs">${t("t.read")}</button></div></section>
     <section class="card"><h3>${t("set.delete")}</h3><p class="small muted">${t("set.delete_lead")}</p>
-      ${UI.askWipe?`<button class="btn" data-act="wipe">${t("set.delete_confirm")}</button>`:`<button class="btn ghost" data-act="askwipe">${t("set.delete")}</button>`}</section>
-    <div class="row"><button class="btn" data-act="go" data-to="${UI.resultSeen?"result":(UI.settingsFrom||"welcome")}">${UI.resultSeen?t("common.to_result"):t("pause.back")}</button></div>`;
+      ${UI.askWipe?`<button class="btn" data-act="wipe">${t("set.delete_confirm")}</button>`:`<button class="btn ghost" data-act="askwipe">${t("set.delete")}</button>`}</section></div>` +
+    dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")));
 }
 
 /* ---------- PIN (lock only, answers stay unencrypted) ---------- */
@@ -2647,34 +2703,34 @@ function modIntro(m){
   if(!hasPartner() && ["wear","attr","toys","poses","power","intens","anal","fant"].includes(m)) out.push(t("mod.intro.no_partner"));
   return out.map(s=>`<p class="note">${s}</p>`).join("");
 }
+function modTile(m){
+  const st = modState(m);
+  return `<button class="tile l${MOD_LVL[m]}" data-act="openmod" data-m="${m}"><span class="tl"><b>${t("mod."+m)}</b><span class="small muted">${t("mod.d."+m)}</span></span><span class="st ${st}">${t("mods.st."+st)}</span></button>`;
+}
 function modsView(){
   const coreSeen = UI.resultSeen;
   const vis = MODS.filter(m=>!modTopicHidden(m));
-  const cards = vis.map(m=>{ const st = modState(m);
-    return `<button class="mod" style="text-align:left" data-act="openmod" data-m="${m}"><b>${t("mod."+m)}</b><span class="small muted">${t("mod.d."+m)}</span>
-      <span class="small"><span class="muted">${t("mods.lvl."+MOD_LVL[m])}</span> · ${t("mods.st."+st)}</span></button>`; }).join("");
-  return head("", t("mods.title"), t("mods.lead")) +
+  const decks = [1,2,3].map(l=>{ const ms = vis.filter(m=>MOD_LVL[m]===l); if(!ms.length) return "";
+    return `<section class="stack" style="gap:8px"><h3>${t("mods.lvl."+l)}</h3><div class="tiles">${ms.map(modTile).join("")}</div></section>`; }).join("");
+  const home = UI.resultSeen ? "result" : "welcome";
+  return topBar("", {to:home}) + pg(head("", t("mods.title"), t("mods.lead")) +
     (coreSeen ? "" : `<p class="note">${t("mods.after_core")}</p>`) +
-    (coreSeen && !P.modules.core_explicit ? `<p class="small muted">${t("mods.lvl3_later")}</p>` : "") +
-    `<div class="mods">${cards}</div>` +
-    (vis.length<MODS.length ? `<p class="small muted">${t("mods.hidden")}</p>` : "") +
-    `<div class="row"><button class="btn" data-act="go" data-to="${UI.resultSeen?"result":"welcome"}">${UI.resultSeen?t("common.to_result"):t("pause.back")}</button></div>`;
+    (coreSeen && !P.modules.core_explicit ? `<p class="small muted">${t("mods.lvl3_later")}</p>` : "") + decks +
+    (vis.length<MODS.length ? `<p class="small muted">${t("mods.hidden")}</p>` : "")) +
+    dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")));
 }
 function modGateView(){
   const m = UI.mod, g = P.modules[m]?.gate;
-  return head(t("mods.title")+" · "+t("mods.lvl."+MOD_LVL[m]), t("mod."+m), t("mod.gate."+m)) +
-    `<div class="card"><div class="chips">${["open","peek","skip"].map(k=>`<button class="chip" aria-pressed="${g===k}" data-act="gate" data-k="${k}">${t("opt.gate."+k)}</button>`).join("")}</div>
-    <p class="small muted">${t("mod.gate.lead")}</p></div>
-    <div class="nav"><button class="btn ghost" data-act="go" data-to="mods">${t("common.back")}</button><button class="btn link" data-act="pause">${t("common.stop")}</button></div>
-    <p class="small"><button class="btn link small" data-act="go" data-to="help">${t("common.help")}</button></p>`;
+  return topBar(t("mods.lvl."+MOD_LVL[m]), {to:"mods", right:barPause()}) + hostChat(t("mod."+m), [t("mod.gate."+m), `<span class="muted">${t("mod.gate.lead")}</span>`]) +
+    dock(`<div class="chips">${["open","peek","skip"].map(k=>`<button class="chip" aria-pressed="${g===k}" data-act="gate" data-k="${k}">${t("opt.gate."+k)}</button>`).join("")}</div>`, helpLink());
 }
 const M_AUTO = new Set(["yn","ynf","pose","zone","lvl","freq","one"]);   // one tap answers these, so the next question follows
 function modView(){
   const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), items = pages[page];
   const peek = P.modules[m]?.gate==="peek" && !UI.peekMore?.[m];
   UI.mi ||= {}; UI.modIntroSeen ||= {};
-  if(!items.length) return modBar(m, page, pages.length) + head(t("mods.lvl."+MOD_LVL[m]), t("mod."+m), "") + `<p class="muted">${t("mod.empty")}</p>
-    <div class="nav"><button class="btn ghost" data-act="go" data-to="mods">${t("mod.to_list")}</button><button class="btn" data-act="modnext">${t("mod.finish")}</button></div>`;
+  if(!items.length) return modBar(m, page, pages.length) + hostChat(t("mod."+m), [t("mod.empty")]) +
+    dock(dockBtn("modnext", t("mod.finish")), subLink("mods", t("mod.to_list")));
   if(page===0 && !UI.modIntroSeen[m]){
     const notes = modIntro(m).replace(/<p class="note">/g,'<div class="msg in new">').replace(/<\/p>/g,"</div>");
     return modBar(m, page, pages.length) + `<div class="chat" aria-live="polite"><div class="msg title">${t("mod."+m)}</div>
@@ -2749,10 +2805,9 @@ function modSummary(m){
 }
 function modResView(){
   const m = UI.mod;
-  return head(t("mod.done_title"), t("mod.res."+m), "") + `<p class="note">${t("r.disclaimer")}</p>
-    <section class="card res">${modSummary(m)}</section>
-    <div class="row"><button class="btn ghost" data-act="openmod" data-m="${m}" data-edit="1">${t("mod.edit")}</button><button class="btn ghost" data-act="go" data-to="mods">${t("mod.to_list")}</button>
-    <button class="btn" data-act="go" data-to="result">${t("common.to_result")}</button></div>`;
+  return topBar(t("mod."+m), {to:"mods"}) + pg(head(t("mod.done_title"), t("mod.res."+m), "") + `<p class="note">${t("r.disclaimer")}</p>
+    <section class="card res">${modSummary(m)}</section>`) +
+    dock(goBtn("result", t("common.to_result")), `<button class="btn link small" data-act="openmod" data-m="${m}" data-edit="1">${t("mod.edit")}</button>${subLink("mods", t("mod.to_list"))}`);
 }
 
 /* ---------- group wp-group/1: invite, guess, pair comparison (spec 14) ---------- */
@@ -2889,16 +2944,15 @@ function inviteView(){
   const c = guessCandidates(), sel = inviteSel();
   const status = G?.partner ? t("inv.st.started") : G?.invite?.sent_at ? t("inv.st.waiting") : "";
   const chips = c.map(id=>`<button class="chip" aria-pressed="${sel.includes(id)}" data-act="invsel" data-id="${id}">${esc(qText(id))} · <span class="muted">${t("opt.yn."+["no","maybe","yes"][P.answers[id]])}</span></button>`).join("");
-  return head("", t("inv.title"), t("inv.lead")) +
+  return topBar(t("pair.title"), {to:"result"}) + `<div class="pg">` + head("", t("inv.title"), t("inv.lead")) +
     (status ? `<p class="note">${status}</p>` : "") +
     `<section class="card"><h3>${t("inv.step1")}</h3><p class="small muted">${t("inv.step1_lead")}</p>
       ${c.length ? `<div class="chips">${chips}</div><p class="small ${sel.length<10?"":"muted"}">${t("inv.count",{n:sel.length})}${sel.length<10?" "+t("inv.few"):""}</p>` : `<p class="muted">${t("inv.none")}</p>`}</section>
     <section class="card"><h3>${t("inv.step2")}</h3><textarea id="inv-ta" data-invtext="1" aria-label="${t("inv.text_label")}" style="word-break:normal;font-size:15px">${esc(inviteText())}</textarea>
       <p class="small muted">${t("inv.text_note")}</p></section>
-    <section class="card"><h3>${t("inv.step3")}</h3><p class="note">${t("inv.link_note")}</p>
-      <div class="row"><button class="btn" data-act="invcopy" ${sel.length?"":"disabled"}>${t("inv.copy")}</button></div><p class="small muted">${t("inv.patience")}</p></section>
-    ${G?.invite?.sent_at ? `<section class="card"><h3>${t("myguess.step")}</h3><p class="small muted">${t("myguess.step_lead")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="myguess">${t("myguess.btn")}</button></div></section>` : ""}
-    <div class="row"><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title")}</button><button class="btn link" data-act="go" data-to="result">${t("common.to_result")}</button></div>`;
+    <section class="card"><h3>${t("inv.step3")}</h3><p class="note">${t("inv.link_note")}</p><p class="small muted">${t("inv.patience")}</p></section>
+    ${G?.invite?.sent_at ? `<section class="card"><h3>${t("myguess.step")}</h3><p class="small muted">${t("myguess.step_lead")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="myguess">${t("myguess.btn")}</button></div></section>` : ""}</div>` +
+    dock(dockBtn("invcopy", t("inv.copy"), sel.length?"":"disabled"), subLink("pair", t("pair.title")) + subLink("result", t("common.to_result")));
 }
 // guess games: one card at a time, then a short wrap-up before the result
 function deckPage(key, ids_, vals, act, {title, eyebrow, lead, done, doneLabel, locked=false}){
@@ -2906,7 +2960,7 @@ function deckPage(key, ids_, vals, act, {title, eyebrow, lead, done, doneLabel, 
   const i = UI.deck[key] ?? 0;
   if(locked || i >= ids_.length){
     const n = ids_.filter(id=>vals[id]!==undefined).length;
-    return `<div class="chat"><div class="msg title">${title}</div><div class="msg in new">${t("deck.done",{n,k:ids_.length})}</div></div>
+    return topBar(eyebrow, {act:"deckgo", attrs:`data-key="${key}" data-i="${Math.max(0,ids_.length-1)}"`, noBack:locked}) + `<div class="chat"><div class="msg title">${title}</div><div class="msg in new">${t("deck.done",{n,k:ids_.length})}</div></div>
       <div class="dock">${locked?"":`<div class="row"><button class="chip" data-act="deckgo" data-key="${key}" data-i="0">${t("deck.again")}</button></div>`}${done}</div>`;
   }
   const id = ids_[i];
@@ -2929,11 +2983,11 @@ function guessResView(){
   const open = UI.guessOpen || {};
   const rows = miss.map(id=>`<div class="brk"><b>${esc(qText(id))}</b><span class="small">${t("guess.their",{a:t("opt.yn."+["no","maybe","yes"][key[id]])})}</span>
     ${open[id]?`<p class="small">${t("guess.talk",{item:qText(id)})}</p>`:`<div class="row"><button class="btn link small" data-act="guessopen" data-id="${id}">${t("guess.discuss")}</button></div>`}</div>`).join("");
-  return head(t("guess.eyebrow"), t("guess.res_title",{n:hit.length,k:ids_.length}), miss.length?t("guess.res_lead",{n:miss.length}):t("guess.res_all")) +
-    `<div class="stack">${rows}</div><p class="note">${t("guess.next_note")}</p>
-    <div class="row"><button class="btn" data-act="go" data-to="identity">${t("guess.next")}</button><button class="btn link" data-act="pause">${t("common.stop")}</button></div>`;
+  return topBar(t("guess.eyebrow"), {to:"guess"}) + pg(head("", t("guess.res_title",{n:hit.length,k:ids_.length}), miss.length?t("guess.res_lead",{n:miss.length}):t("guess.res_all")) +
+    `<div class="stack">${rows}</div><p class="note">${t("guess.next_note")}</p>`) +
+    dock(goBtn("identity", t("guess.next")), `<button class="btn link small" data-act="pause">${t("common.stop")}</button>`);
 }
-function laterView(){ return head("", t("inv.later_title"), t("inv.later_text")) + `<div class="row"><button class="btn ghost" data-act="go" data-to="welcome">${t("pause.back")}</button></div>`; }
+function laterView(){ return topBar("", {to:"welcome"}) + hostChat(t("inv.later_title"), [t("inv.later_text")]) + dock(goBtn("welcome", t("pause.back"))); }
 
 /* pair math (spec 14.2) */
 function pairMatches(){
@@ -3005,7 +3059,7 @@ function pairView(){
         if(nb.length) brakes = `<section class="card res"><h3>${t("pair.brakes")}</h3><ul class="tips small">${nb.map(([k])=>`<li><b>${t("brk."+k)}.</b> ${t("tip."+k+".1")}</li>`).join("")}</ul></section>`; }
       const few = p.l1>=0.8 && l1Share()>=0.8 && R.l1<5 ? hintBox("pair_few") : "";
       const waiting = MODS.filter(m=>modDone(m) && !p.mods.includes(m));
-      const todo = `<section class="card"><h3>${t("pair.todo")}</h3><p class="small muted">${t("pair.todo_lead")}</p><div class="row"><button class="btn" data-act="go" data-to="plan">${t("plan.open")}</button><button class="btn ghost" data-act="go" data-to="ideas">${t("idea.open")}</button></div></section>`;
+      const todo = `<p class="note">${t("pair.todo_lead")}</p>`;
       const nY = R.sections.reduce((a,x)=>a+x.yes.length+x.lines.filter(l=>l.c!=="maybe").length,0), nM = R.sections.reduce((a,x)=>a+x.maybe.length+x.lines.filter(l=>l.c==="maybe").length,0);
       const hero = `<div class="pairhero"><b>${nY}</b><span>${t("pair.hero",{n:nY})}</span>${nM?`<span class="muted">${t("pair.hero_m",{n:nM})}</span>`:""}</div>`;
       compare = `${hero}<p class="note">${t("pair.private")}</p>${todo}${few}${secHtml||`<p class="muted">${t("pair.none")}</p>`}${talk}${style}${brakes}
@@ -3016,12 +3070,13 @@ function pairView(){
       <textarea id="pair-ta" readonly aria-label="${t("pair.my_code_label")}">${esc(appLink(partnerCode()))}</textarea><div class="row"><button class="btn ghost" data-act="copy" data-src="pair-ta">${t("common.copy")}</button></div></section>`
     : `<p class="note">${t("pair.need_core")}</p>`;
   const add = `<section class="card"><label class="q" for="pimp-ta">${p?t("pair.replace"):t("pair.add")}</label><textarea id="pimp-ta" placeholder="${t("pair.add_ph")}"></textarea>
-      <div class="row"><button class="btn ghost" data-act="pairimport">${t("pair.add_btn")}</button><span class="small muted" id="pimp-msg"></span></div>
+      <div class="row"><button class="btn ghost" data-act="pairimport">${t("pair.add_btn")}</button><span class="err" id="pimp-msg" role="alert"></span></div>
       ${pendingPair?`<div class="flag"><p>${t("pair.confirm")}</p><div class="row"><button class="btn" data-act="pairyes">${t("pair.confirm_yes")}</button><button class="btn ghost" data-act="pairno">${t("set.import_no")}</button></div></div>`:""}
       ${p?`<p class="small muted">${t("pair.received")}</p><div class="row"><button class="btn link small" data-act="pairdel">${t("pair.delete")}</button></div>`:""}</section>`;
   const inv = G?.role!=="invitee" && hasPartner() ? `<div class="row"><button class="btn ghost" data-act="go" data-to="invite">${t("inv.title")}</button>${G?.invite?.sent_at||partnerQ()?`<button class="btn ghost" data-act="go" data-to="${G.guess.a_seen&&partnerQ()?"myguessres":"myguess"}">${partnerQ()&&!G.guess.a_seen?t("myguess.ready_btn"):t("myguess.btn")}</button>`:""}</div>` : "";
-  return head("", p ? t("pair.title_with") : t("pair.title"), t("pair.lead")) + compare + myCode + (coreDone() ? revealCard() : "") + add + inv +
-    `<div class="row"><button class="btn" data-act="go" data-to="${UI.resultSeen?"result":"welcome"}">${UI.resultSeen?t("common.to_result"):t("pause.back")}</button><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button></div>`;
+  const home = UI.resultSeen ? "result" : "welcome", ready = p && coreDone() && p.core;
+  return topBar(t("pair.title"), {to:home}) + pg(head("", p ? t("pair.title_with") : t("pair.title"), t("pair.lead")) + compare + myCode + (coreDone() ? revealCard() : "") + add + inv) +
+    dock(ready ? goBtn("plan", t("plan.open")) : goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")), (ready ? subLink("ideas", t("idea.open")) : "") + helpLink());
 }
 
 /* ---------- ideas and plan for a pair (spec 14.3, 15) ---------- */
@@ -3255,11 +3310,11 @@ function ideasView(){
   }).join("");
   const poseHtml = poses.length ? `<section class="card res"><details><summary><h3 style="display:inline">${t("idea.k.pose")}</h3> <span class="small muted">· ${Math.min(poses.length,12)}</span></summary><div class="stack" style="margin-top:10px">${poses.slice(0,12).map(p=>`<div class="brk"><b>${esc(p.q)}${p.fresh?` <span class="pill m">${t("idea.new")}</span>`:""}</b>${p.r?`<span class="small muted">${esc(p.r)}</span>`:""}${rateBtns(p.id)}</div>`).join("")}</div></details></section>` : "";
   const pw = ideas.some(k=>k.pw);
-  return head(t("idea.eyebrow"), t("idea.title"), t("idea.lead")) + `<p class="note">${t("idea.private")}</p>` +
+  return topBar(t("idea.eyebrow"), {to:"pair"}) + pg(head("", t("idea.title"), t("idea.lead")) + `<p class="note">${t("idea.private")}</p>` +
     (pw ? `<p class="note">${t("pair.agree")}</p>` : "") +
     (groups||poseHtml ? groups + poseHtml : `<p class="muted">${t("idea.none")}</p>`) +
-    `<p class="small muted">${t("idea.rate_note")}</p>
-    <div class="row"><button class="btn" data-act="go" data-to="plan">${t("plan.open")}</button><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`;
+    `<p class="small muted">${t("idea.rate_note")}</p>`) +
+    dock(goBtn("plan", t("plan.open")), subLink("pair", t("pair.title_with")));
 }
 function planView(){
   if(!G?.partner || !coreDone() || !G.partner.core) return pairView();
@@ -3269,14 +3324,14 @@ function planView(){
   const fnote = F.common?.includes(fmt) ? `<p class="small muted">${t("plan.fmt_both")}</p>` : "";   // no note otherwise: it would hint at the partner's lower interest
   const rows = plan.steps.map(s=>`<div class="brk"><span class="small muted">${esc(s.time)}</span><b>${esc(s.title)}</b>${s.text?`<span class="small">${esc(s.text)}</span>`:""}${s.role?`<span class="small muted">${esc(s.role)}</span>`:""}
     ${lvlNote(s.lvl)}${safeNote(s.safe)}${s.rateId && UI.planRate ? rateBtns(s.rateId) : ""}</div>`).join("");
-  return head(t("plan.eyebrow"), t("plan.title"), t("plan.lead")) + tabs + fnote +
+  return topBar(t("plan.eyebrow"), {to:"pair"}) + `<div class="pg">` + head("", t("plan.title"), t("plan.lead")) + tabs + fnote +
     `<section class="card"><h3>${t("plan.f."+fmt)}</h3>${plan.pw?`<p class="note">${t("pair.agree")}</p>`:""}<div class="stack">${rows}</div>
       <p class="small muted">${t("plan.total",{n:plan.total})}</p>
-      <div class="row"><button class="btn" data-act="plancopy">${t("plan.copy")}</button><button class="btn ghost" data-act="planagain">${t("plan.again")}</button><button class="btn ghost" aria-pressed="${!!UI.planRate}" data-act="planrate">${t("plan.rate")}</button></div>
-      ${UI.planCopyAsk?`<div class="flag"><p>${t("plan.copy_ask")}</p><div class="row"><button class="btn" data-act="plancopy">${t("plan.copy_yes")}</button><button class="btn ghost" data-act="plancopyno">${t("set.import_no")}</button></div></div>`:""}
+      <div class="row"><button class="btn ghost" data-act="planagain">${t("plan.again")}</button><button class="btn ghost" aria-pressed="${!!UI.planRate}" data-act="planrate">${t("plan.rate")}</button></div>
       ${UI.planRate?`<p class="small muted">${t("idea.rate_note")}</p>`:""}</section>
-    <p class="small muted">${t("plan.note")}</p>
-    <div class="row"><button class="btn ghost" data-act="go" data-to="ideas">${t("idea.open")}</button><button class="btn link" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`;
+    <p class="small muted">${t("plan.note")}</p></div>` +
+    dock(UI.planCopyAsk ? `<p class="small">${t("plan.copy_ask")}</p>${dockBtn("plancopy", t("plan.copy_yes"))}` : dockBtn("plancopy", t("plan.copy")),
+      UI.planCopyAsk ? `<button class="btn link small" data-act="plancopyno">${t("set.import_no")}</button>` : subLink("ideas", t("idea.open")) + subLink("pair", t("pair.title_with")));
 }
 
 /* inviter's side of the guess game (spec 14.1 p. 4): guesses are made here before or after the partner answers;
@@ -3289,7 +3344,7 @@ function myGuessView(){
   const lead = q ? (done ? t("myguess.lead_done") : t("myguess.lead_ready")) : t("myguess.lead_wait");
   const finish = q ? `<button class="btn wide" data-act="myguessdone">${done?t("myguess.see"):t("guess.done")}</button><div class="row"><button class="btn link" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`
     : `<p class="note">${G.partner ? t("myguess.no_q") : t("myguess.wait")}</p><button class="btn wide" data-act="go" data-to="${G.partner?"pair":"invite"}">${t("myguess.save_exit")}</button>`;
-  if(!ids_.length) return head(t("guess.eyebrow"), t("myguess.title"), lead) + `<p class="muted">${t("inv.none")}</p>` + finish;
+  if(!ids_.length) return topBar(t("guess.eyebrow"), {to:"pair"}) + hostChat(t("myguess.title"), [lead, t("inv.none")]) + `<div class="dock">${finish}</div>`;
   return deckPage("myguess", ids_, g, "myguess", {title:t("myguess.title"), eyebrow:t("guess.eyebrow"), lead, doneLabel:t("guess.done"), done:finish, locked:done});
 }
 function myGuessResView(){
@@ -3299,8 +3354,8 @@ function myGuessResView(){
   const yn = v => v==null ? t("guess.dunno").toLowerCase() : t("opt.yn."+["no","maybe","yes"][v]).toLowerCase();
   const rows = miss.map(id=>`<div class="brk"><b>${esc(qText(id))}</b><span class="small">${t("myguess.res_line",{g:yn(g[id]),a:yn(key[id])})}</span>
     ${open[id]?`<p class="small">${t("guess.talk",{item:qText(id)})}</p>`:`<div class="row"><button class="btn link small" data-act="guessopen" data-id="${id}">${t("guess.discuss")}</button></div>`}</div>`).join("");
-  return head(t("guess.eyebrow"), t("guess.res_title",{n:hit.length,k:ids_.length}), miss.length?t("guess.res_lead",{n:miss.length}):t("myguess.res_all")) +
-    `<div class="stack">${rows}</div><div class="row"><button class="btn" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`;
+  return topBar(t("guess.eyebrow"), {to:"pair"}) + pg(head("", t("guess.res_title",{n:hit.length,k:ids_.length}), miss.length?t("guess.res_lead",{n:miss.length}):t("myguess.res_all")) +
+    `<div class="stack">${rows}</div>`) + dock(goBtn("pair", t("pair.title_with")));
 }
 // invitee: answers opened for the inviter's guess game, sent inside WPP1 only after an explicit choice
 function revealCandidates(){ return guessCandidates().filter(id=>!ITEM[id] || modDone(ITEM[id].mod)); }
@@ -3327,7 +3382,7 @@ function render(){
   const s = SCR[UI.screen];
   app.innerHTML = s && s.kind==="items" ? itemsView(s) : (VIEWS[UI.screen]||(UI.screen==="story"?VIEWS.result:VIEWS.welcome))();
   bindCard();
-  if(app.querySelector(".dock") && app.querySelector(".chat .msg.new")) requestAnimationFrame(()=>window.scrollTo(0, document.body.scrollHeight));
+  if(FORMS[UI.screen] && app.querySelector(".dock") && app.querySelector(".chat .msg.new")) requestAnimationFrame(()=>window.scrollTo(0, document.body.scrollHeight));
 }
 function rerender(){ const y = window.scrollY; render(); window.scrollTo(0,y); }
 let toastTimer;
@@ -3354,6 +3409,7 @@ app.addEventListener("input", e=>{
 });
 app.addEventListener("change", e=>{ if(e.target.dataset.input==="relationship.partner_name") rerender(); });
 app.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.id==="pin-new") document.querySelector('[data-act="setpin"]')?.click();
   if(e.key==="Enter" && e.target.id==="pin-in") document.querySelector('[data-act="unlock"]')?.click();
   if(e.key==="Enter" && e.target.closest(".dock") && (e.target.dataset.input || e.target.dataset.filter)) document.querySelector('.dock [data-act="fdone"]:not([data-skip])')?.click();
 });
@@ -3467,6 +3523,7 @@ app.addEventListener("click", async e=>{
       document.getElementById("pin-msg").textContent = t("p.lock_wrong"); return;
     }
     case "pinreset": UI.pinResetAsk = true; return render();
+    case "pinresetno": UI.pinResetAsk = false; return render();
     case "askwipe": UI.askWipe = true; return rerender();
     case "wipe": { lsDel(STORE_KEY); lsDel(UI_KEY); lsDel(GROUP_KEY); G = null; pendingPair = null; P = newProfile(); pendingImport = null; UI = {screen:"welcome", resultSeen:false, pauses:{}, draftTerms:{}}; locked=false; return render(); }
     case "import": {
@@ -3579,7 +3636,7 @@ app.addEventListener("click", async e=>{
 (function readLink(){
   const m = location.hash.match(/#wp=([^&\s]+)/); if(!m) return;
   try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
-  let r; try{ r = readCode(m[1]); }catch(e){ return; }
+  let r; try{ r = readCode(m[1]); }catch(e){ setTimeout(()=>toast(t("link.bad")), 0); return; }
   if(r.kind==="invite"){
     if(G && G.group_id===r.data.g && G.role==="inviter"){ setTimeout(()=>toast(t("pair.invite_own")),0); return; }
     pendingInvite = r.data; UI.screen = "welcome";
