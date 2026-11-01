@@ -122,10 +122,29 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .msg.new{animation:pop .35s ease both}
 .msg.new:nth-of-type(2){animation-delay:.12s}.msg.new:nth-of-type(3){animation-delay:.24s}
 @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.dock{position:sticky;bottom:0;z-index:4;padding:12px 0 calc(10px + env(safe-area-inset-bottom, 0px));background:linear-gradient(rgba(20,11,16,0),var(--bg) 22%);display:grid;gap:10px}
+/* composer: solid panel under the chat, options never cover the messages */
+.dock{position:sticky;bottom:0;z-index:4;margin-top:14px;padding:12px 0 calc(12px + env(safe-area-inset-bottom, 0px));background:var(--bg);border-top:1px solid var(--line);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax -100px);display:grid;gap:10px;transition:opacity .17s ease,transform .17s ease}
+.wrap:has(> .dock){min-height:calc(100svh - 40px);grid-template-rows:auto 1fr auto;align-content:start}
+.dock.sent{opacity:0;transform:translateY(10px)}
 .dock .chips{justify-content:flex-end}
+.dock .copts{max-height:min(36svh,280px);overflow-y:auto;overscroll-behavior:contain}
 .dock .row{justify-content:flex-end}
 .dock input{border-radius:999px}
+.cbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cbar input{flex:1;min-width:0}
+.send{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--cta-grad);color:var(--accent-ink)}
+.send:disabled{background:var(--surface-2);color:var(--muted);opacity:.7}
+.skiplink{min-height:44px;padding:0 4px;font-size:14px;color:var(--muted)}
+.sugg{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:-2px;padding:2px}
+.sugg[id]{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent);padding-right:40px}
+.sugg::-webkit-scrollbar{display:none}
+.sugg .chip{flex:none;white-space:nowrap}
+.cfield{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 6px 6px 14px;border-radius:24px;border:1px solid #4A2F3B;background:#1E1218}
+.cfield:focus-within{border-color:var(--accent)}
+.cfield input{flex:1;min-width:8em;border:0;background:none;padding:6px 0;min-height:0;outline:none;font:inherit;font-size:16px;color:var(--fg)}
+.tok{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.nomatch{margin:0;text-align:right}
+@media (prefers-reduced-motion: reduce){.dock{transition:none}}
 /* one question per screen */
 .qpage{display:flex;flex-direction:column;gap:14px;min-height:calc(100svh - 90px)}
 .qmeta{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
@@ -141,6 +160,7 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .opt.na[aria-checked="true"]{color:var(--fg);background:var(--no-bg);border-color:var(--no)}
 .qfoot{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .qfoot button{min-height:44px;font-size:14px;color:var(--muted)}
+.qfoot .fwd{color:var(--fg);font-weight:600;white-space:nowrap;padding:0 14px;border:1px solid var(--line);border-radius:999px}
 /* cards */
 .deck{position:relative;flex:1;min-height:300px;max-height:440px;margin:6px 6px 0}
 .qcard{position:absolute;inset:0;border-radius:28px;padding:22px 20px;display:flex;flex-direction:column;gap:10px}
@@ -149,8 +169,8 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .qcard.front{background:var(--card-grad);color:var(--accent-ink);box-shadow:0 24px 40px -18px rgba(0,0,0,.85);transition:transform .28s ease,opacity .28s ease;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
 .qcard.front.drag{transition:none}
 .qcard .suit{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;opacity:.75}
-.qcard .cq{font-family:var(--display);font-size:clamp(30px,8.6vw,36px);line-height:1.04;font-weight:700;margin-top:auto}
-.qcard .sub{font-size:14px;opacity:.85}
+.qcard .cq{font-family:var(--display);font-size:clamp(30px,8.6vw,36px);line-height:1.08;font-weight:700;margin:auto 0;text-align:center;text-wrap:balance;padding-top:28px}
+.qcard .sub{font-size:14px;opacity:.85;text-align:center;margin-top:-6px}
 .stamp{position:absolute;top:64px;border:3px solid var(--accent-ink);color:var(--accent-ink);font-weight:800;font-size:17px;letter-spacing:.12em;padding:2px 10px;border-radius:8px;opacity:0;text-transform:uppercase}
 .stamp.y{right:18px;transform:rotate(12deg)} .stamp.n{left:18px;transform:rotate(-12deg)} .stamp.m{left:50%;top:44px;transform:translateX(-50%)}
 .stamp.on{opacity:.85}
@@ -213,24 +233,6 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
 .qone .col>.small{font-size:14px;color:var(--fg)}
 .qone .skip{display:none}
 /* stories */
-.story{min-height:calc(100svh - 20px);display:flex;flex-direction:column;gap:14px;padding-top:14px;position:relative}
-.story .bars{display:flex;gap:4px}
-.story .bars i{flex:1;height:3px;border-radius:2px;background:#3A2A32}
-.story .bars i.on{background:var(--fg)}
-.story .slide{flex:1;display:flex;flex-direction:column;gap:16px;position:relative;z-index:2;pointer-events:none}
-.story .slide button,.story .slide summary{pointer-events:auto}
-.story h2{font-size:clamp(38px,11vw,48px);line-height:.98}
-.story .slide>p{font-size:16px;color:#E2CDD5}
-.story .gauges{display:grid;gap:14px;margin-top:auto}
-.story .g{display:grid;gap:6px}
-.story .g .l{display:flex;justify-content:space-between;font-size:14px;color:#D1BCC5}
-.story .g .t{height:12px;border-radius:6px;background:#2E1F27;overflow:hidden}
-.story .g .t i{display:block;height:100%;border-radius:6px}
-.story .disc{font-size:12px;color:var(--muted)}
-.story .fine{font-size:12px;color:var(--muted);text-align:center;position:relative;z-index:2}
-.tapzones{position:absolute;inset:40px 0 0;display:grid;grid-template-columns:30% 70%;z-index:1}
-.tapzones button{min-height:100%}
-.tapzones button:focus-visible{outline-offset:-4px}
 /* pair */
 .pairhero{display:grid;gap:2px;justify-items:center;text-align:center;padding:10px 0 4px}
 .pairhero b{font-family:var(--display);font-size:72px;line-height:1;font-weight:600;color:var(--accent)}
@@ -329,6 +331,10 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "doc.back": "Назад",
   "l.title": "Язык",
   "l.q": "На каком языке играем?",
+  "opt.lang.ru": "Русский",
+  "opt.lang.uk": "Українська",
+  "opt.lang.pl": "Polski",
+  "opt.lang.en": "English",
   "l.note": "Пока только русский. Другие языки добавим, когда отшлифуем русские тексты.",
   "s.title": "Где хранить ответы",
   "s.device": "Только на этом устройстве",
@@ -401,11 +407,11 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "opt.label.queer": "Квир",
   "opt.label.none": "Не ищу слов",
   "opt.label.custom": "Свой вариант",
-  "q.orientation.experience": "Какой у тебя опыт партнёрского секса?",
+  "q.orientation.experience": "Как у тебя с опытом в сексе?",
   "q.orientation.experience.hint": "Необязательно. Влияет на формулировки и темп идей.",
   "opt.exp.none": "Пока не было",
   "opt.exp.some": "Немного",
-  "opt.exp.plenty": "Достаточно",
+  "opt.exp.plenty": "Немало",
   "rel.title": "Твои отношения",
   "rel.lead": "От этого зависят формулировки и то, предложим ли сыграть вдвоём.",
   "q.relationship.status": "Что у тебя сейчас?",
@@ -440,7 +446,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "core.g.title": "Что тебя заводит",
   "core.g.lead": "Насколько это про тебя? От 1 «совсем не про меня» до 5 «точно про меня».",
   "core.b.title": "Что мешает",
-  "core.b.lead": "Насколько это про тебя? Тормоза есть у всех, и они меняются. Хороших и плохих ответов тут нет.",
+  "core.b.lead": "Насколько это про тебя? Что-то мешает всем, и это меняется со временем. Хороших и плохих ответов тут нет.",
   "core.s.title": "Твой стиль",
   "core.s.lead": "Насколько это про тебя?",
   "core.x2.title": "Откровеннее",
@@ -551,6 +557,10 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "opt.anat.other": "Другое или интерсекс-вариация",
   "opt.anat.undisclosed": "Не хочу указывать",
   "opt.anat.varies": "По-разному",
+  "opt.panat.penis": "Пенис",
+  "opt.panat.vulva": "Вульва",
+  "opt.panat.varies": "По-разному",
+  "opt.panat.undisclosed": "Не хочу указывать",
   "q.body.stop_zones": "Касаться каких мест нельзя или не хочется никогда?",
   "q.body.stop_zones.hint": "Необязательно. Практики с этими местами будут скрыты.",
   "opt.zone.face": "Лицо",
@@ -562,8 +572,8 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "opt.zone.feet": "Ступни",
   "opt.zone.genitals": "Гениталии",
   "opt.zone.none": "Таких нет",
-  "q.orientation.partner_anatomy": "Какая анатомия у партнёра или партнёров — сейчас или вообще?",
-  "q.orientation.partner_anatomy.hint": "Когда партнёр пришлёт свой код, совпадения учтут его ответы.",
+  "q.orientation.partner_anatomy": "Какие гениталии у партнёра или партнёров?",
+  "q.orientation.partner_anatomy.hint": "Чтобы предлагать то, что вам подходит. Если партнёров несколько и у них по-разному, так и отметь.",
   "r.title": "Твой профиль",
   "r.title.m": "Готово! Вот твой профиль",
   "r.title.f": "Готово! Вот твой профиль",
@@ -583,7 +593,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "r.gas.all": "Вся раскладка",
   "r.brakes": "Что тебе мешает",
   "r.brakes.lead": "Сильнее остальных у тебя:",
-  "r.brakes.calm": "Сильных тормозов по ответам не видно. Заметнее остальных:",
+  "r.brakes.calm": "Ничего сильно не мешает. Заметнее остальных:",
   "r.brakes.tips": "Что можно попробовать",
   "r.brakes.all": "Вся раскладка",
   "r.brakes.nodata": "Ответов про то, что сбивает настрой, пока нет.",
@@ -670,7 +680,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "hint.title": "Подсказка",
   "hint.dismiss": "Скрыть подсказку",
   "hint.pain": "Боль или страх боли мешают заметно. С этим помогают врач (гинеколог, уролог) или сексолог: это частый запрос, и с ним часто удаётся помочь.",
-  "hint.brakes": "Несколько тормозов выражены сильно. Сексолог или психолог помогут разобраться, что с ними делать, без спешки и оценок.",
+  "hint.brakes": "Сразу несколько вещей сильно мешают. Сексолог или психолог помогут разобраться, что с ними делать, без спешки и оценок.",
   "hint.duty": "Соглашаться на секс без желания не обязательно: «не сейчас» — тоже ответ. Если хочется разобраться, почему так выходит, поможет психолог или сексолог.",
   "hint.stop": "Начните с жестового сигнала «стоп» и с правила: любой из вас может остановить игру без объяснений. Удобен «светофор»: красный — стоп, жёлтый — медленнее.",
   "hint.consent_ok": "Тебе легко сказать «стоп». Это помогает и в новых идеях.",
@@ -742,7 +752,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "set.pin_remove": "Убрать PIN",
   "set.share": "Что показывать партнёру в игре вдвоём",
   "set.share_axes": "Стиль",
-  "set.share_brakes": "Что мешает (тормоза)",
+  "set.share_brakes": "Что мешает",
   "set.code": "Код профиля",
   "set.code_lead": "Сохрани код, чтобы восстановить ответы на другом устройстве или после очистки браузера.",
   "set.import": "Восстановить из кода",
@@ -1383,7 +1393,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "pair.waiting": "Ждут, когда партнёр пройдёт",
   "pair.more": "Совпадения по теме открываются, когда её прошли оба. Пришлёт партнёр новый код — совпадения обновятся.",
   "pair.my_code": "Твой код для партнёра",
-  "pair.my_code_lead": "Отправь партнёру ссылку или код. В нём твоё имя из профиля (если указано), «Да» и «Может» из главной части, откровенных вопросов и пройденных тем, зелёные зоны, уровни, роль в позах и то, что открыто в настройках. В нём нет твоих «Нет», закрытых тормозов, частоты, своей фантазии и скрытых тем.",
+  "pair.my_code_lead": "Отправь партнёру ссылку или код. В нём твоё имя из профиля (если указано), «Да» и «Может» из главной части, откровенных вопросов и пройденных тем, зелёные зоны, уровни, роль в позах и то, что открыто в настройках. В нём нет твоих «Нет», закрытых ответов о том, что мешает, частоты, своей фантазии и скрытых тем.",
   "pair.code_warn": "Приложение покажет партнёру только совпадения и то, чем ты делишься (зоны, «что важно после»), но по коду технически можно прочитать всё перечисленное выше. Отправляй только тому, кому доверяешь. После новых ответов скопируй код ещё раз.",
   "pair.add": "Код партнёра",
   "pair.replace": "Обновить код партнёра",
@@ -1648,6 +1658,12 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "opt.lik.4": "скорее да",
   "chat.go": "Поехали",
   "chat.done": "Готово",
+  "chat.send": "Отправить",
+  "chat.type": "Напиши ответ",
+  "chat.filter": "Начни писать или выбери",
+  "chat.filter_more": "Ещё что-то?",
+  "chat.nomatch": "Такого варианта нет. Выбери из подсказок или пропусти.",
+  "chat.nomatch_other": "Такого варианта нет. Отправь как есть, запишем своими словами.",
   "chat.all_set": "Готово. Идём дальше?",
   "chat.edit": "Изменить ответ",
   "chat.more": "{title}: продолжение",
@@ -1658,25 +1674,6 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
   "deck.done": "Готово: отвечено {n} из {k}. Можно пройти карты ещё раз или идти дальше.",
   "deck.again": "Пройти карты заново",
   "mod.to_list_short": "Темы",
-  "story.k": "Твой профиль · {n} из {k}",
-  "story.skip": "Весь профиль",
-  "story.tap": "Касание справа — дальше, слева — назад",
-  "story.open": "Смотреть как сторис",
-  "story.full": "Открыть весь профиль",
-  "story.of5": "{v} из 5",
-  "story.gas": "Что заводит",
-  "story.brakes": "Что мешает",
-  "story.h.gas": "Газ у тебя <em>сильнее</em> тормозов",
-  "story.h.brakes": "Тормоза сейчас <em>громче</em> газа",
-  "story.h.even": "Газ и тормоза <em>в равновесии</em>",
-  "story.top_h": "Что тебя <em>заводит</em> сильнее всего",
-  "story.brk_h": "Что сбивает <em>настрой</em>",
-  "story.brk_note": "Тормоза есть у всех, и они меняются. Что с ними делать — в полном профиле.",
-  "story.style_h": "Твой <em>стиль</em>",
-  "story.int_h": "Что тебе <em>интересно</em>",
-  "story.int_note": "Розовое — «да», жёлтое — «может».",
-  "story.end": "Это <em>твой</em> профиль",
-  "story.end_lead": "Дальше — полный разбор с подсказками, темы на выбор и игра вдвоём.",
   "pair.hero": "общих «да»",
   "pair.hero_m": "и ещё {n} «может» — повод поговорить"
 }
@@ -1920,9 +1917,7 @@ function next(){
     } }
   if(SCR[cur]?.extra) P.modules.core_explicit = {done:true, at:now()};
   if(!P.modules.core) P.modules.core = {done:true, at:now()};
-  const firstTime = !UI.storySeen;
   UI.resultSeen = true; UI.extraFlow = false;
-  if(firstTime){ UI.storySeen = true; UI.storyI = 0; return go("story"); }
   go("result");
 }
 function back(){
@@ -2044,7 +2039,6 @@ const VIEWS = {
   rel(){ return chatForm("rel"); },
   body_late(){ return chatForm("body_late"); },
   result(){ return resultView(); },
-  story(){ return storyView(); },
   pause(){
     const again = UI.pauseAgain;
     return head("", t("pause.title"), t("pause.text")) + `${again?`<div class="flag"><p>${t("pause.again")}</p><div class="row"><button class="btn ghost" data-act="skipfrom">${t("pause.skip_block")}</button><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button></div></div>`:""}
@@ -2095,7 +2089,8 @@ function itemsView(s){
   const i = qIndex(s), id = list[i], v = P.answers[id];
   const hint = RU["q."+id+".hint"] ? t("q."+id+".hint") : "";
   const meta = `<div class="qmeta"><span>${esc(t(s.title+".title"))}</span><span>${t("q.n_of",{n:i+1,k:list.length})}</span></div>`;
-  const foot = `<div class="qfoot"><button data-act="skipq" data-id="${id}" aria-pressed="${v===null}">${v===null?t("common.skipped"):t("common.skip")}</button>
+  const fwd = id in P.answers ? `<button class="fwd" data-act="qfwd">${t("common.next")} →</button>` : "";   // came back: go on without changing the answer
+  const foot = `<div class="qfoot"><button data-act="skipq" data-id="${id}" aria-pressed="${v===null}">${v===null?t("common.skipped"):t("common.skip")}</button>${fwd}
     ${UI.resultSeen?`<button data-act="go" data-to="result">${t("common.to_result")}</button>`:`<button data-act="go" data-to="help">${t("common.help")}</button>`}</div>`;
   let body;
   if(lik){
@@ -2171,6 +2166,12 @@ function pinSetter(){
 
 /* ---------- getting acquainted as a chat (docs/design-guide.md) ---------- */
 // one field = one question from the host; the person answers with chips or a short text
+// partner's genitals: one plain choice for the person, the full anatomy list for matching (paHas)
+const PANAT = {
+  set:{penis:["penis","testes","prostate"], vulva:["vulva","vagina"], varies:["varies"], undisclosed:["undisclosed"]},
+  get(arr){ if(!arr?.length) return null; const p=arr.includes("penis"), v=arr.includes("vulva")||arr.includes("vagina");
+    return p&&v ? "varies" : p ? "penis" : v ? "vulva" : arr.includes("undisclosed") ? "undisclosed" : "varies"; }
+};
 const FORMS = {
   identity:{title:"id", fields:[
     {path:"identity.name", kind:"text", max:20},
@@ -2178,7 +2179,7 @@ const FORMS = {
     {path:"identity.gender_custom", kind:"text", max:30, when:()=>P.identity.gender==="custom"},
     {path:"identity.grammar", kind:"one", opt:"grammar", opts:["m","f","n"]}]},
   body_early:{title:"be", fields:[
-    {path:"body.limits", kind:"multi", opt:"limits", opts:["none","knees","back","neck","standing","hips","wrists","chronic_pain","mobility","fatigue","pregnancy","other"], ex:["none"]},
+    {path:"body.limits", kind:"multi", opt:"limits", opts:["none","knees","back","neck","standing","hips","wrists","chronic_pain","mobility","fatigue","pregnancy","other"], ex:["none"], other:"body.limits_other"},
     {path:"body.limits_other", kind:"text", max:80, when:()=>P.body.limits.includes("other")},
     {path:"body.latex_allergy", kind:"one", opt:"latex", opts:["yes","no","unknown"]}]},
   orient:{title:"or", fields:[
@@ -2195,10 +2196,10 @@ const FORMS = {
   body_late:{title:"bl", fields:[
     {path:"body.anatomy", kind:"multi", opt:"anat", opts:["penis","testes","prostate","vulva","vagina","other","undisclosed"], ex:["undisclosed"], quick:true},
     {path:"body.stop_zones", kind:"multi", opt:"zone", opts:["face","neck","chest","belly","buttocks","anus","feet","genitals","none"], ex:["none"]},
-    {path:"orientation.partner_anatomy", kind:"multi", opt:"anat", opts:["penis","testes","prostate","vulva","vagina","varies","undisclosed"], ex:["varies","undisclosed"]},
+    {path:"orientation.partner_anatomy", kind:"one", opt:"panat", opts:["penis","vulva","varies","undisclosed"], map:PANAT},
     {path:"settings.hidden_topics", kind:"topics"}]}
 };
-const fieldVal = f => f.kind==="text" && uiField(f.path) ? UI.partnerName : getPath(f.path);
+const fieldVal = f => f.map ? f.map.get(getPath(f.path)) : f.kind==="text" && uiField(f.path) ? UI.partnerName : getPath(f.path);
 const hasVal = v => Array.isArray(v) ? v.length>0 : v!=null && v!=="";
 function formFields(id){ return FORMS[id].fields.filter(f=>!f.when || f.when()); }
 function formDone(id){
@@ -2221,28 +2222,45 @@ function fieldAsk(f){
   const hint = RU[hk] ? t(hk) : (f.kind==="multi" ? t("common.multi") : "");
   return `<div class="msg in${fresh?" new":""}">${esc(label)}${hint?`<br><span class="muted">${esc(hint)}</span>`:""}</div>`;
 }
+// the composer: options above, "send" always in the same place; a choice is only a draft until it is sent
+const SEND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function sendBtn(f, on){ return `<button class="send" data-act="fdone" data-path="${f.path}" aria-label="${t("chat.send")}" ${on?"":"disabled"}>${SEND_ICON}</button>`; }
 function fieldDock(f){
-  const v = fieldVal(f) || [];
-  const skip = `<button class="chip" data-act="fdone" data-path="${f.path}" data-skip="1">${t("common.skip")}</button>`;
-  if(f.kind==="text") return `<input type="text" id="f-${f.path}" aria-label="${esc(t("q."+f.path))}" maxlength="${f.max}" value="${esc(fieldVal(f)||"")}" data-input="${f.path}" autocomplete="off">
-    <div class="row">${skip}<button class="chip" aria-pressed="true" data-act="fdone" data-path="${f.path}">${t("common.next")}</button></div>`;
-  if(f.kind==="one") return `<div class="chips">${f.opts.map(o=>`<button class="chip" aria-pressed="${v===o}" data-act="one" data-chat="1" data-path="${f.path}" data-val="${o}">${esc(t(`opt.${f.opt}.${o}`))}</button>`).join("")}${skip}</div>`;
+  const v = fieldVal(f), has = hasVal(v);
+  const skip = `<button class="skiplink" data-act="fdone" data-path="${f.path}" data-skip="1">${t("common.skip")}</button>`;
+  const cbar = (left, on) => `<div class="cbar">${left||"<span></span>"}${sendBtn(f, on)}</div>`;
+  if(f.kind==="text") return `<div class="cbar"><input type="text" id="f-${f.path}" aria-label="${esc(t("q."+f.path))}" maxlength="${f.max}" value="${esc(v||"")}" data-input="${f.path}" autocomplete="off" placeholder="${esc(t("chat.type"))}">${sendBtn(f, true)}</div>
+    <div class="cbar">${skip}</div>`;
+  if((f.kind==="one"||f.kind==="multi") && f.opts.length>5) return suggDock(f, v, has, skip);
+  if(f.kind==="one") return `<div class="copts chips">${f.opts.map(o=>`<button class="chip" aria-pressed="${v===o}" data-act="one" data-chat="1" data-path="${f.path}" data-val="${o}">${esc(t(`opt.${f.opt}.${o}`))}</button>`).join("")}</div>${cbar(has?"":skip, has)}`;
   if(f.kind==="topics") { const h=P.settings.hidden_topics;
-    return `<div class="chips">${["power","intens","anal","fant"].map(k=>`<button class="chip" aria-pressed="${h.includes(k)}" data-act="topic" data-k="${k}">${t("topic."+k)}</button>`).join("")}</div>
-    <div class="row"><button class="btn" data-act="fdone" data-path="${f.path}">${h.length?t("chat.done"):t("chat.hide_none")}</button></div>`; }
-  const quick = f.quick ? `<div class="row small"><button class="chip" data-act="anatquick" data-set="p">${t("opt.anat.quick_p")}</button><button class="chip" data-act="anatquick" data-set="v">${t("opt.anat.quick_v")}</button></div>` : "";
-  return `${quick}<div class="chips">${f.opts.map(o=>`<button class="chip" aria-pressed="${v.includes(o)}" data-act="multi" data-path="${f.path}" data-val="${o}" data-ex="${(f.ex||[]).join(",")}">${esc(t(`opt.${f.opt}.${o}`))}</button>`).join("")}</div>
-    <div class="row">${v.length?"":skip}<button class="btn" data-act="fdone" data-path="${f.path}" ${v.length?"":"disabled"}>${t("chat.done")}</button></div>`;
+    return `<div class="copts chips">${["power","intens","anal","fant"].map(k=>`<button class="chip" aria-pressed="${h.includes(k)}" data-act="topic" data-k="${k}">${t("topic."+k)}</button>`).join("")}</div>
+    <div class="cbar"><span class="small muted">${h.length?"":t("chat.hide_none")}</span>${sendBtn(f, true)}</div>`; }
+  const quick = f.quick ? `<div class="row small">${["p","v"].map(k=>`<button class="chip" data-act="anatquick" data-set="${k}">${t("opt.anat.quick_"+k)}</button>`).join("")}</div>` : "";
+  return `${quick}<div class="copts chips">${f.opts.map(o=>`<button class="chip" aria-pressed="${v.includes(o)}" data-act="multi" data-path="${f.path}" data-val="${o}" data-ex="${(f.ex||[]).join(",")}">${esc(t(`opt.${f.opt}.${o}`))}</button>`).join("")}</div>${cbar(has?"":skip, has)}`;
 }
+// many options: a row of suggestions over a chat input; typing filters them like autocomplete
+function suggDock(f, v, has, skip){
+  const sel = Array.isArray(v) ? v : has ? [v] : [];
+  const act = f.kind==="one" ? `data-act="one" data-chat="1"` : `data-act="multi" data-ex="${(f.ex||[]).join(",")}"`;
+  const lab = o => esc(t(`opt.${f.opt}.${o}`));
+  const quick = f.quick ? `<div class="sugg">${["p","v"].map(k=>`<button class="chip" data-act="anatquick" data-set="${k}">${t("opt.anat.quick_"+k)}</button>`).join("")}</div>` : "";
+  return `${quick}<div class="sugg" id="sugg">${f.opts.map(o=>`<button class="chip" aria-pressed="${sel.includes(o)}" ${act} data-path="${f.path}" data-val="${o}" data-l="${lab(o).toLowerCase()}">${lab(o)}</button>`).join("")}</div>
+    <p class="small muted nomatch" hidden>${t(f.other?"chat.nomatch_other":"chat.nomatch")}</p>
+    <div class="cbar"><label class="cfield" for="flt">${sel.map(o=>`<span class="tok">${lab(o)}</span>`).join("")}<input id="flt" data-filter="${f.path}" placeholder="${esc(t(sel.length?"chat.filter_more":"chat.filter"))}" autocomplete="off" enterkeyhint="send"></label>${sendBtn(f, has)}</div>
+    ${has?"":`<div class="cbar">${skip}</div>`}`;
+}
+let lastSent = null;   // the answer that was just sent pops in like a new message
 function chatForm(id){
   const F = FORMS[id], fields = formFields(id), done = formDone(id);
   const cur = fields.find(f=>!done.includes(f.path));
   const past = fields.filter(f=>done.includes(f.path)).map(f=>{
     const a = fieldAnswer(f);
     return `<div class="msg in">${esc(f.kind==="topics"?t("w.hide"):t("q."+f.path))}</div>
-      <button class="msg out${a?"":" skipped"}" data-act="fedit" data-path="${f.path}" aria-label="${esc(t("chat.edit"))}">${esc(a||t("common.skipped"))}</button>`;
+      <button class="msg out${a?"":" skipped"}${lastSent===id+":"+f.path?" new":""}" data-act="fedit" data-path="${f.path}" aria-label="${esc(t("chat.edit"))}">${esc(a||t("common.skipped"))}</button>`;
   }).join("");
   const intro = `<div class="msg title">${t(F.title+".title")}</div><div class="msg in">${t(F.title+".lead")}</div>`;
+  lastSent = null;
   const dock = cur ? fieldDock(cur) : `<div class="row"><button class="btn wide" data-act="next">${t(id==="body_late"?"chat.go":"common.next")}</button></div>`;
   return bar(SCR[id], "fback") + `<div class="chat" aria-live="polite">${intro}${past}${cur?fieldAsk(cur):`<div class="msg in new">${t("chat.all_set")}</div>`}</div>
     <div class="dock">${dock}</div>`;
@@ -2274,36 +2292,6 @@ function hintBox(key){
 function meterRow(label, v, max, muted){
   const w = v==null?0:Math.max(0,Math.min(1,(v-1)/(max-1)))*100;
   return `<div class="meter"><span>${esc(label)}</span><span class="t${muted?" mut":""}"><i style="width:${w}%"></i></span><span class="v">${v==null?"—":String(Math.round(v*10)/10).replace(".",",")}</span></div>`;
-}
-// the profile as stories: one thought per slide, then the full profile
-function storyView(){
-  const S = computeScales();
-  const gas = mean(ids("g",1,11).map(num)), brk = mean(Object.values(S.brakes));
-  const head_ = gas==null && brk==null ? "" : (gas??0)-(brk??0) >= 0.75 ? t("story.h.gas") : (brk??0)-(gas??0) >= 0.75 ? t("story.h.brakes") : t("story.h.even");
-  const ease = S.gas.ease, isAce = P.orientation.label==="ace";
-  const easeText = ease==null ? "" : isAce ? t("r.gas.ease_ace",{v:String(ease).replace(".",",")}) : ease>=4 ? t("r.gas.ease_hi") : ease>=2.75 ? t("r.gas.ease_mid") : t("r.gas.ease_lo");
-  const g = (lab,v,c) => `<div class="g"><div class="l"><span>${lab}</span><span>${v==null?"—":t("story.of5",{v:String(Math.round(v*10)/10).replace(".",",")})}</span></div><div class="t"><i style="width:${v==null?0:v/5*100}%;background:${c}"></i></div></div>`;
-  const tops = Object.entries(S.gas.channels).filter(([,v])=>v>=4).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const brakes = Object.entries(S.brakes).sort((a,b)=>b[1]-a[1]).slice(0,2).filter(([,v])=>v>=3);
-  const axes = Object.entries(S.axes).filter(([,v])=>Math.abs(v)>=0.5).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3);
-  const ym = yesMaybe(), ys = Object.values(ym).flatMap(x=>x.y).slice(0,8), ms = Object.values(ym).flatMap(x=>x.m).slice(0,4);
-  const slides = [];
-  if(head_) slides.push(`<h2>${head_}</h2>${easeText?`<p>${easeText}</p>`:""}<div class="gauges">${g(t("story.gas"),gas,"var(--accent)")}${g(t("story.brakes"),brk,"var(--maybe)")}</div><p class="disc">${t("r.disclaimer")}</p>`);
-  if(tops.length) slides.push(`<h2>${t("story.top_h")}</h2><div class="acc">${tops.map(([k])=>`<div class="a"><b>${t("ch."+k)}</b><span>${t("idea.ch."+k)}</span></div>`).join("")}</div>`);
-  if(brakes.length) slides.push(`<h2>${t("story.brk_h")}</h2><div class="stack">${brakes.map(([k])=>`<div class="brk"><b>${t("brk."+k)}</b><span class="small">${t("brk.d."+k)}</span></div>`).join("")}</div><p class="disc">${t("story.brk_note")}</p>`);
-  if(axes.length) slides.push(`<h2>${t("story.style_h")}</h2><div class="stack">${axes.map(([k,v])=>`<div class="brk"><span class="small muted">${t("ax."+k)}</span><b class="big" style="font-size:24px">${t("ax."+k+(v<0?".l":".r"))}</b></div>`).join("")}</div><p class="disc">${t("r.style.lead")}</p>`);
-  if(ys.length||ms.length) slides.push(`<h2>${t("story.int_h")}</h2><div class="pills">${ys.map(id=>`<span class="pill y">${esc(qText(id))}</span>`).join("")}${ms.map(id=>`<span class="pill m">${esc(qText(id))}?</span>`).join("")}</div><p class="disc">${t("story.int_note")}</p>`);
-  const canInvite = hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only";
-  slides.push(`<h2>${t("story.end")}</h2><p>${t("story.end_lead")}</p><div class="stack" style="margin-top:auto">
-    <button class="btn wide" data-act="go" data-to="result">${t("story.full")}</button>
-    ${canInvite?`<button class="btn ghost" data-act="go" data-to="invite">${t("r.invite.open")}</button>`:""}
-    <button class="btn ghost" data-act="go" data-to="mods">${t("r.next.all")}</button></div>`);
-  const i = Math.max(0, Math.min(slides.length-1, UI.storyI||0)), lastI = slides.length-1;
-  return `<div class="story"><div class="bars">${slides.map((_,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
-    <div class="row" style="justify-content:space-between;position:relative;z-index:3"><span class="eyebrow">${t("story.k",{n:i+1,k:slides.length})}</span><button class="stop" data-act="go" data-to="result">${t("story.skip")}</button></div>
-    <div class="slide">${slides[i]}</div>
-    ${i<lastI?`<div class="tapzones"><button data-act="storygo" data-i="${i-1}" aria-label="${t("common.back")}" ${i?"":"disabled"}></button><button data-act="storygo" data-i="${i+1}" aria-label="${t("common.next")}"></button></div>
-    <p class="fine">${t("story.tap")}</p>`:`${i?`<button class="btn link" data-act="storygo" data-i="${i-1}">← ${t("common.back")}</button>`:""}`}</div>`;
 }
 function resultView(){
   const S = computeScales(); P.scales = S;
@@ -2403,7 +2391,7 @@ function resultView(){
 
   const name = P.identity.name ? esc(P.identity.name) : "";
   return `<header class="screen" style="padding-top:32px"><p class="eyebrow">${name||t("app.name")}</p><h2 style="font-size:40px">${t("r.title")}</h2>
-    <p class="note">${t("r.disclaimer")}</p>${anyAnswer?`<div class="row"><button class="btn ghost" data-act="storygo" data-i="0" data-open="1">${t("story.open")}</button></div>`:""}</header>
+    <p class="note">${t("r.disclaimer")}</p></header>
     ${anyAnswer?"":`<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`}${blocks.join("")}
     <div class="row"><button class="btn link" data-act="go" data-to="help">${t("common.help")}</button><button class="btn link" data-act="go" data-to="settings">${t("common.settings")}</button></div>`;
 }
@@ -2705,7 +2693,7 @@ function modView(){
     ${M_AUTO.has(it.t)?"":`<button class="btn wide" data-act="mstep">${t("common.next")}</button>`}`;
   const last = page===pages.length-1 && i===items.length-1;
   return modBar(m, page, pages.length) + `<div class="qpage"><div class="qmeta"><span>${esc(t("mod."+m))}</span><span>${t("q.n_of",{n:pos,k:total})}</span></div>${body}
-    <div class="qfoot"><button data-act="skipq" data-id="${id}">${t("common.skip")}</button>
+    <div class="qfoot"><button data-act="skipq" data-id="${id}">${t("common.skip")}</button>${id in P.answers?`<button class="fwd" data-act="mfwd">${t("common.next")} →</button>`:""}
     ${peek && modItems(m).length>5 ? `<button data-act="peekmore">${t("mod.peek_more")}</button>` : peek||last ? `<button data-act="modnext" data-whole="1">${peek?t("mod.peek_stop"):t("mod.finish")}</button>` : `<button data-act="go" data-to="help">${t("common.help")}</button>`}</div></div>`;
 }
 function mAdvance(){
@@ -3337,7 +3325,7 @@ function render(){
   if(locked){ app.innerHTML = VIEWS.lock(); setTimeout(()=>document.getElementById("pin-in")?.focus(),0); return; }
   if(!consented() && !["welcome","terms","under18","help","docs","later"].includes(UI.screen)){ UI.screen="welcome"; }
   const s = SCR[UI.screen];
-  app.innerHTML = s && s.kind==="items" ? itemsView(s) : (VIEWS[UI.screen]||VIEWS.welcome)();
+  app.innerHTML = s && s.kind==="items" ? itemsView(s) : (VIEWS[UI.screen]||(UI.screen==="story"?VIEWS.result:VIEWS.welcome))();
   bindCard();
   if(app.querySelector(".dock") && app.querySelector(".chat .msg.new")) requestAnimationFrame(()=>window.scrollTo(0, document.body.scrollHeight));
 }
@@ -3355,6 +3343,11 @@ app.addEventListener("input", e=>{
   const at = e.target.dataset.anstext;
   if(at){ const v = e.target.value.slice(0,500); if(v.trim()) P.answers[at] = v; else delete P.answers[at]; save(); return; }
   if(e.target.dataset.invtext){ UI.inviteText = e.target.value; save(); return; }
+  if(e.target.dataset.filter){ const q=e.target.value.trim().toLowerCase(); let n=0;
+    app.querySelectorAll("#sugg .chip").forEach(c=>{ const hit=!q || c.dataset.l.includes(q); c.hidden=!hit; if(hit) n++; });
+    const nm=app.querySelector(".nomatch"); if(nm) nm.hidden = n>0;
+    const sb=app.querySelector('.dock .send'); if(sb) sb.disabled = !q && !hasVal(fieldVal(FORMS[UI.screen].fields.find(f=>f.path===e.target.dataset.filter)));
+    return; }
   const path = e.target.dataset.input; if(!path) return;
   if(uiField(path)){ UI.partnerName = e.target.value.trim() || null; save(); return; }
   setPath(path, e.target.value.trim() || (path==="identity.name"?"":null)); save();
@@ -3362,7 +3355,7 @@ app.addEventListener("input", e=>{
 app.addEventListener("change", e=>{ if(e.target.dataset.input==="relationship.partner_name") rerender(); });
 app.addEventListener("keydown", e=>{
   if(e.key==="Enter" && e.target.id==="pin-in") document.querySelector('[data-act="unlock"]')?.click();
-  if(e.key==="Enter" && e.target.closest(".dock") && e.target.dataset.input) document.querySelector('.dock [data-act="fdone"]:not([data-skip])')?.click();
+  if(e.key==="Enter" && e.target.closest(".dock") && (e.target.dataset.input || e.target.dataset.filter)) document.querySelector('.dock [data-act="fdone"]:not([data-skip])')?.click();
 });
 app.addEventListener("click", async e=>{
   const b = e.target.closest("[data-act]"); if(!b || b.disabled) return;
@@ -3389,8 +3382,9 @@ app.addEventListener("click", async e=>{
     case "topic": { const k=b.dataset.k, h=P.settings.hidden_topics; P.settings.hidden_topics = h.includes(k)?h.filter(x=>x!==k):[...h,k]; save(); return rerender(); }
     case "one": {
       const path=b.dataset.path, val=b.dataset.val;
-      setPath(path, getPath(path)===val && !b.dataset.chat ? null : val);
-      if(b.dataset.chat){ const d=formDone(UI.screen); if(!d.includes(path)) d.push(path); }
+      const ff = b.dataset.chat && FORMS[UI.screen]?.fields.find(f=>f.path===path);
+      if(ff?.map){ setPath(path, ff.map.get(getPath(path))===val ? [] : ff.map.set[val]); save(); return rerender(); }
+      setPath(path, getPath(path)===val ? null : val);   // in the chat a choice is a draft until "send"
       if(path==="identity.gender" && getPath(path)){ const g=getPath(path); if(!P.identity.grammar || UI.grammarAuto){ P.identity.grammar = g==="man"?"m":g==="woman"?"f":"n"; UI.grammarAuto=true; } } // R2
       if(path==="identity.grammar") UI.grammarAuto=false;
       if(path==="relationship.status" && val==="single"){ P.relationship.partner_joins=null; }
@@ -3424,10 +3418,24 @@ app.addEventListener("click", async e=>{
       if(SCR[UI.screen]?.kind==="items"){ P.answers[id]=null; save(); return qAdvance(); }
       if(P.answers[id]===null) delete P.answers[id]; else P.answers[id]=null; save(); return rerender(); }
     case "qback": return qBack();
+    case "qfwd": return qAdvance();
+    case "mfwd": return mAdvance();
     case "introgo": UI.introSeen[UI.screen] = true; UI.qi ||= {}; save(); render(); window.scrollTo(0,0); return;
-    case "fdone": { const id=UI.screen, path=b.dataset.path, done=formDone(id);
-      if(b.dataset.skip){ const f=FORMS[id].fields.find(f=>f.path===path); if(f.kind==="text"){ if(uiField(path)) UI.partnerName=null; else setPath(path, path==="identity.name"?"":null); } }
-      if(!done.includes(path)) done.push(path); save(); return rerender(); }
+    case "fdone": { const id=UI.screen, path=b.dataset.path, done=formDone(id), f=FORMS[id].fields.find(f=>f.path===path);
+      if(b.dataset.skip){ if(f.kind==="text"){ if(uiField(path)) UI.partnerName=null; else setPath(path, path==="identity.name"?"":null); }
+        else setPath(path, f.kind==="one" ? (f.map ? [] : null) : []); }
+      const typed = !b.dataset.skip && document.getElementById("flt")?.value.trim();
+      if(typed){   // typed text: pick the only matching suggestion, or keep it as "other"
+        const m = [...app.querySelectorAll("#sugg .chip:not([hidden])")];
+        if(m.length===1 && m[0].getAttribute("aria-pressed")!=="true"){ m[0].click(); if(!hasVal(fieldVal(f))) return; }
+        else if(f.other){ setPath(path, [...(getPath(path)||[]).filter(x=>!(f.ex||[]).includes(x)), "other"].filter((x,i,a)=>a.indexOf(x)===i)); setPath(f.other, typed.slice(0,80)); if(!done.includes(f.other)) done.push(f.other); }
+        else if(!hasVal(fieldVal(f))) return;
+      }
+      if(!b.dataset.skip && f.kind!=="text" && f.kind!=="topics" && !hasVal(fieldVal(f))) return;
+      if(!done.includes(path)) done.push(path); save(); lastSent = id+":"+path;
+      const dock = app.querySelector(".dock");
+      if(dock && !matchMedia("(prefers-reduced-motion: reduce)").matches){ dock.classList.add("sent"); return setTimeout(rerender, 170); }
+      return rerender(); }
     case "fedit": { const done=formDone(UI.screen); UI.fdone[UI.screen] = done.filter(p=>p!==b.dataset.path); save(); return rerender(); }
     case "fback": { const done=formDone(UI.screen); const vis=formFields(UI.screen).map(f=>f.path).filter(p=>done.includes(p));
       if(!vis.length) return back(); UI.fdone[UI.screen] = done.filter(p=>p!==vis.at(-1)); save(); return rerender(); }
@@ -3513,7 +3521,6 @@ app.addEventListener("click", async e=>{
     case "mstep": return mAdvance();
     case "mback": return mBack();
     case "deckgo": { UI.deck ||= {}; UI.deck[b.dataset.key] = Math.max(0, Number(b.dataset.i)); save(); render(); window.scrollTo(0,0); return; }
-    case "storygo": { const n = Number(b.dataset.i); if(n<0) return; UI.storyI = n; if(b.dataset.open) return go("story"); save(); return render(); }
     case "modnext": {
       if(b.dataset.whole) return modNextPage();
       const pages = modPages(UI.mod);
