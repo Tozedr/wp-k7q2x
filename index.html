@@ -272,6 +272,50 @@ body:has(.dock){padding-bottom:0}
 .pairhero{display:grid;gap:2px;justify-items:center;text-align:center;padding:10px 0 4px}
 .pairhero b{font-family:var(--display);font-size:72px;line-height:1;font-weight:600;color:var(--accent)}
 .pairhero span{font-size:15px}
+/* tab bar (variant B, 2026-11-01): Главная · Темы · Пара · Я, shown once the profile is ready and hidden inside questions */
+:root{--tabh:60px}
+body.tabs{padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px))}
+body.tabs .wrap:has(> .dock){min-height:calc(100svh - var(--tabh) - env(safe-area-inset-bottom, 0px))}
+body.tabs .dock{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));padding-bottom:12px;clip-path:inset(0 -100vmax 0)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(20,11,16,.97);border-top:1px solid var(--line);
+  padding:0 max(8px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(8px, env(safe-area-inset-left, 0px));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.tabbar>div{display:contents}
+.tb{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;height:calc(var(--tabh) - 1px);font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.02em}
+.tb svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tb[aria-current="page"]{color:var(--accent)}
+.tb[aria-current="page"] svg{fill:var(--yes-bg)}
+.tb .dot{position:absolute;top:9px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--bg)}
+.coach{position:fixed;left:max(16px, env(safe-area-inset-left, 0px));right:max(16px, env(safe-area-inset-right, 0px));bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12px);z-index:9;max-width:520px;margin:0 auto;background:var(--fg);color:var(--accent-ink);border-radius:18px;padding:14px 16px;display:grid;gap:4px;box-shadow:0 14px 36px rgba(0,0,0,.55)}
+.coach b{font-weight:700}
+.coach p{font-size:14px}
+.coach button{justify-self:start;min-height:44px;font-weight:700;text-decoration:underline;text-underline-offset:3px;color:var(--accent-ink)}
+.bar .act{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:flex-end;color:var(--muted)}
+.bar .act svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+.nextcard{display:grid;gap:6px;text-align:left;width:100%;padding:16px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(247,198,214,.16),rgba(227,120,157,.08));border:1px solid rgba(227,120,157,.45)}
+.nextcard b{font-family:var(--display);font-size:26px;line-height:1.1;font-weight:600}
+.nextcard .go{color:var(--accent);font-weight:600;font-size:15px}
+.rows{display:grid;background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:0 16px}
+.rows>*{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 0;border-bottom:1px solid var(--line);text-align:left;width:100%}
+.rows>*:last-child{border-bottom:0}
+.rows .tl{display:grid;gap:2px;min-width:0}
+.rows b{font-weight:600}
+.rows .r{color:var(--muted);font-size:13px;white-space:nowrap}
+.rows .chev{color:var(--muted);font-size:18px}
+.rows .danger{color:var(--accent)}
+.ladder{display:grid}
+.step{position:relative;display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:center;min-height:64px;padding:10px 0;text-align:left;width:100%}
+.step i{font-style:normal;position:relative;z-index:1;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--line)}
+.step.ok i{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step.now i{border-color:var(--accent);color:var(--accent)}
+.step.now b{color:var(--fg)}
+.step:disabled{cursor:default}
+.step:disabled b{color:var(--muted)}
+body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12px)}
+.bar .stop{min-width:44px}
+.step:not(:last-child)::after{content:"";position:absolute;left:16px;top:calc(50% + 16px);height:calc(100% - 32px);width:1px;background:var(--line)}
+.step .tl{display:grid;gap:2px;min-width:0}
+.step b{font-weight:600}
+.step .chev{color:var(--muted);font-size:18px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1712,7 +1756,71 @@ body:has(.dock){padding-bottom:0}
   "pair.hero": "общих «да»",
   "pair.hero_m": "и ещё {n} «может» — повод поговорить",
   "bar.prestart": "Перед стартом",
-  "link.bad": "Ссылка не открылась: похоже, она обрезалась при копировании. Попроси прислать её ещё раз."
+  "link.bad": "Ссылка не открылась: похоже, она обрезалась при копировании. Попроси прислать её ещё раз.",
+  "tab.home": "Главная",
+  "tab.topics": "Темы",
+  "tab.pair": "Пара",
+  "tab.me": "Я",
+  "tab.nav": "Разделы",
+  "tab.dot": "есть начатое или новое",
+  "tabs.coach.t": "Теперь всё по разделам",
+  "tabs.coach": "Внизу четыре вкладки: главное о тебе, темы, игра вдвоём и настройки. Точка на вкладке — там есть начатое или новое.",
+  "tabs.coach.ok": "Понятно",
+  "home.hi": "Привет, <em>{name}</em>",
+  "home.hi_anon": "Привет",
+  "home.lock": "Закрыть на PIN",
+  "home.next": "Следующий шаг",
+  "home.brief": "Коротко о тебе",
+  "home.progress": "Сколько пройдено",
+  "home.next.cont": "Продолжи тему «{m}»",
+  "home.next.cont_d": "Ответы на месте — начнёшь с того же вопроса.",
+  "home.next.match": "Посмотри ваши совпадения",
+  "home.next.match_d": "Ответы {P_gen} уже здесь.",
+  "home.next.invite": "Позови {P_gen} в игру вдвоём",
+  "home.next.invite_d": "Пара минут: выбери вопросы для угадайки и отправь ссылку.",
+  "home.next.x_d": "Ещё несколько вопросов, если хочется. После них откроются самые откровенные темы.",
+  "home.next.try": "Попробуй тему «{m}»",
+  "home.next.go": "Вперёд →",
+  "home.sum.gas": "Сильнее всего: {list}",
+  "home.sum.brakes": "Чаще всего: {list}",
+  "home.sum.brakes_calm": "Ничего заметно не мешает",
+  "home.sum.style": "Где ты на четырёх шкалах",
+  "home.sum.int": "«Да» — {y}, «может» — {m}",
+  "home.sum.none": "Пока мало ответов",
+  "home.prog.core": "Главное",
+  "home.prog.core_done": "готово",
+  "home.prog.core_todo": "не закончено",
+  "home.prog.mods": "Темы",
+  "home.prog.mods_n": "{n} из {k}",
+  "home.prog.pair": "Игра вдвоём",
+  "home.prog.pair_none": "не начата",
+  "home.prog.pair_wait": "ждём ссылку",
+  "home.prog.pair_n": "совпадений: {n}",
+  "pair.st.invite": "Позвать {P_gen}",
+  "pair.st.invite_d": "Выбери вопросы для угадайки и отправь ссылку",
+  "pair.st.invite_sent": "Приглашение отправлено",
+  "pair.st.link": "Добавить ссылку {P_gen}",
+  "pair.st.link_d": "Есть ссылка от {P_gen}? Вставь её здесь",
+  "pair.st.link_ok": "Добавлено",
+  "pair.st.link_mine": "Там же — твоя ссылка для {P_gen}",
+  "pair.st.match": "Ваши совпадения",
+  "pair.st.match_wait": "Откроются, когда добавишь ссылку {P_gen}",
+  "pair.st.match_n": "Совпадений: {n}",
+  "pair.st.ideas": "Идеи",
+  "pair.st.ideas_d": "Только из ваших «да» и «может»",
+  "pair.st.plan": "План на вас двоих",
+  "pair.st.plan_d": "Вечер, выходные или каждый день",
+  "pair.st.guess": "Угадайка",
+  "pair.st.guess_d": "Угадай ответы {P_gen}",
+  "pair.st.guess_ready": "Ответы {P_gen} пришли — проверь себя",
+  "pair.link.title": "Обмен ссылками",
+  "set.privacy": "Приватность",
+  "set.lock_now": "Закрыть на PIN сейчас",
+  "set.lock_now_d": "Откроется только по PIN",
+  "set.answers": "Мои ответы",
+  "set.data": "Сохранить и перенести",
+  "set.about": "О приложении",
+  "set.prompt_d": "Скопируй и вставь в любой ИИ-чат, чтобы обсудить профиль"
 }
 </script>
 
@@ -2092,7 +2200,8 @@ const VIEWS = {
   orient(){ return chatForm("orient"); },
   rel(){ return chatForm("rel"); },
   body_late(){ return chatForm("body_late"); },
-  result(){ return resultView(); },
+  result(){ return homeView(); },
+  prof(){ return profView(); },
   pause(){
     const again = UI.pauseAgain;
     return topBar(t("bar.pause"), {to:UI.pausedAt||"welcome"}) + hostChat(t("pause.title"), [t("pause.text"), again?t("pause.again"):""]) +
@@ -2112,6 +2221,8 @@ const VIEWS = {
   guessres(){ return G?.guess_key ? guessResView() : VIEWS.welcome(); },
   later(){ return laterView(); },
   pair(){ return pairView(); },
+  pairmatch(){ return pairMatchView(); },
+  pairlink(){ return pairLinkView(); },
   ideas(){ return ideasView(); },
   plan(){ return planView(); },
   myguess(){ return myGuessView(); },
@@ -2347,11 +2458,12 @@ function meterRow(label, v, max, muted){
   const w = v==null?0:Math.max(0,Math.min(1,(v-1)/(max-1)))*100;
   return `<div class="meter"><span>${esc(label)}</span><span class="t${muted?" mut":""}"><i style="width:${w}%"></i></span><span class="v">${v==null?"—":String(Math.round(v*10)/10).replace(".",",")}</span></div>`;
 }
-function resultView(){
+/* profile sections: the long page is split into one screen per section (tabs, 2026-11-01) */
+function profBlocks(){
   const S = computeScales(); P.scales = S;
   const isAce = P.orientation.label==="ace";
   const nobody = P.orientation.attracted_to.includes("nobody");
-  const blocks = [];
+  const blocks = {};
   const anyAnswer = CORE_IDS.some(id=>typeof P.answers[id]==="number");
   const gasAnswered = ["core.g01","core.g02",...Object.values(CHANNELS)].some(id=>num(id)!=null);
 
@@ -2359,7 +2471,7 @@ function resultView(){
   const ease = S.gas.ease;
   const easeText = ease==null ? "" : isAce ? t("r.gas.ease_ace",{v:String(ease).replace(".",",")}) : ease>=4 ? t("r.gas.ease_hi") : ease>=2.75 ? t("r.gas.ease_mid") : t("r.gas.ease_lo");
   const tops = Object.entries(S.gas.channels).filter(([,v])=>v>=4).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  blocks.push(`<section class="card res"><h3>${t("r.gas")}</h3>
+  blocks.gas = (`<section class="card res">
     ${easeText?`<p class="big">${easeText}</p>`:""}
     ${num("core.g11")>=4?`<p>${t("r.gas.responsive")}</p>`:""}
     ${!gasAnswered?`<p class="muted">${t("r.gas.nodata")}</p>`:tops.length?`<p class="q" style="font-weight:600">${t("r.gas.top")}</p><div class="acc">${tops.map(([k])=>`<div class="a"><b>${t("ch."+k)}</b><span>${t("idea.ch."+k)}</span></div>`).join("")}</div>`:`<p class="muted">${t("r.gas.none")}</p>`}
@@ -2382,7 +2494,7 @@ function resultView(){
   if(pain>=4) brakesHtml += hintBox("pain");
   if(Object.values(S.brakes).filter(v=>v>=4).length>=3 || Object.values(S.brakes).some(v=>v>=5)) brakesHtml += hintBox("brakes");
   if(num("core.b15")>=4) brakesHtml += hintBox("duty");
-  blocks.push(`<section class="card res"><h3>${t("r.brakes")}</h3>${brakesHtml||`<p class="muted">${t("r.brakes.nodata")}</p>`}
+  blocks.brakes = (`<section class="card res">${brakesHtml||`<p class="muted">${t("r.brakes.nodata")}</p>`}
     <details><summary class="small muted">${t("r.brakes.all")}</summary><div class="meters" style="padding-top:10px">${Object.keys(BRAKES).map(k=>meterRow(t("brk."+k),S.brakes[k]??null,5,true)).join("")}</div></details></section>`);
 
   // style
@@ -2391,7 +2503,7 @@ function resultView(){
   const c01 = num("core.c01");
   const powerYes = ["core.w20","core.w21","core.w22","core.w23"].some(id=>P.answers[id]===2||P.answers[id]===1);
   const consentHtml = c01!=null && c01<=2 && powerYes ? hintBox("stop") : c01>=4 ? `<p class="small muted">${t("hint.consent_ok")}</p>` : "";
-  blocks.push(`<section class="card res"><h3>${t("r.style")}</h3><p class="small muted">${t("r.style.lead")}</p><div class="axes">${axesHtml}</div>${consentHtml}
+  blocks.style = (`<section class="card res"><p class="small muted">${t("r.style.lead")}</p><div class="axes">${axesHtml}</div>${consentHtml}
     ${hasPartner()?`<div class="field" style="border-top:1px solid var(--line);padding-top:14px"><p class="q">${t("r.style.share")}</p><div class="chips">
       <button class="chip" aria-pressed="${P.share_prefs.axes}" data-act="share" data-k="axes" data-v="1">${t("r.style.share_yes")}</button>
       <button class="chip" aria-pressed="${!P.share_prefs.axes}" data-act="share" data-k="axes" data-v="0">${t("r.style.share_no")}</button></div><p class="small muted">${t("r.style.share_note")}</p></div>`:""}</section>`);
@@ -2399,56 +2511,118 @@ function resultView(){
   // interests
   const ym = yesMaybe();
   const groups = MODS.filter(m=>ym[m]).map(m=>`<div class="g"><h3>${t("mod."+m)}</h3><div class="pills">${ym[m].y.map(id=>`<span class="pill y">${esc(qText(id))}</span>`).join("")}${ym[m].m.map(id=>`<span class="pill m">${esc(qText(id))}</span>`).join("")}</div></div>`).join("");
-  const interests = `<section class="card res"><h3>${t("r.interests")}</h3><div class="pills"><span class="pill y">${t("r.yes")}</span><span class="pill m">${t("r.maybe")}</span></div>
+  blocks.interests = `<section class="card res"><div class="pills"><span class="pill y">${t("r.yes")}</span><span class="pill m">${t("r.maybe")}</span></div>
     <div class="groups">${groups||`<p class="muted">${t("r.interests.none")}</p>`}</div>${nobody?`<p class="note">${t("r.alone")}</p>`:""}</section>`;
-  const g = P.relationship.goals;
-  if(g.includes("ideas") && !g.includes("self")) blocks.splice(1,0,interests); else blocks.push(interests);
-
-  // explicit block offer
-  const xDone = !!P.modules.core_explicit;
-  const xVisible = SCR.x2.items.concat(SCR.x3.items).some(itemVisible);
-  if(xVisible) blocks.push(`<section class="card res"><h3>${t("r.x.title")}</h3>${nobody&&!xDone?`<p class="muted">${t("r.x.ace")}</p>`:`<p>${t("r.x.text")}</p>`}
-    <div class="row"><button class="btn${nobody&&!xDone?" ghost":""}" data-act="extra">${xDone?t("r.x.edit"):t("r.x.start")}</button></div></section>`);
-
-  // next
-  const {top, later} = recommendModules();
-  blocks.push(`<section class="card res"><h3>${t("r.next")}</h3><p class="muted">${t("r.next.lead")}</p>
-    <div class="tiles">${top.map(modTile).join("")}</div>
-    ${later.length?`<p class="small muted">${t("r.next.later")}: ${later.map(m=>t("mod."+m)).join(", ")}</p>`:""}
-    <div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("r.next.all")}</button></div></section>`);
-
-  // module blocks (spec 16.3)
-  const doneMods = MODS.filter(m=>modDone(m) && !modTopicHidden(m));
-  if(doneMods.length) blocks.push(`<section class="card res"><h3>${t("r.mods")}</h3><p class="small muted">${t("r.mods.lead")}</p>
-    ${doneMods.map(m=>`<details><summary><b>${t("mod.res."+m)}</b></summary><div class="stack" style="padding-top:8px">${modSummary(m)}
-      <div class="row"><button class="btn link small" data-act="openmod" data-m="${m}" data-edit="1">${t("mod.edit")}</button></div></div></details>`).join("")}</section>`);
-
-  // invite
-  if(hasPartner() || G?.partner){
-    const canInvite = hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only";
-    blocks.push(`<section class="card res"><h3>${t("r.pair")}</h3><p class="small muted">${t("r.pair.lead")}</p>
-      ${G?.invite?.sent_at||G?.partner?`<p class="small">${G?.partner?t("inv.st.started"):t("inv.st.waiting")}</p>`:""}
-      <div class="row">${canInvite?`<button class="btn${G?.partner?" ghost":""}" data-act="go" data-to="invite">${t("r.invite.open")}</button>`:""}<button class="btn ghost" data-act="go" data-to="pair">${t("r.pair.open")}</button></div>
-      ${canInvite?`<p class="small muted">${t("r.invite.note")}</p>`:""}</section>`);
-  }
 
   // safety notes
   const safety = [];
   if(P.body.latex_allergy==="yes") safety.push(t("r.safety.latex"));
   if(P.body.limits.includes("pregnancy")) safety.push(t("r.safety.preg"));
-  if(safety.length) blocks.push(`<section class="card res"><h3>${t("r.safety")}</h3><ul class="tips">${safety.map(s=>`<li>${s}</li>`).join("")}</ul></section>`);
+  blocks.safety = safety.length ? (`<section class="card res"><h3>${t("r.safety")}</h3><ul class="tips">${safety.map(s=>`<li>${s}</li>`).join("")}</ul></section>`) : "";
 
-  // tools
-  blocks.push(`<section class="card res"><h3>${t("r.tools")}</h3><p class="small muted">${t("r.tools.lead")}</p>
-    <div class="row"><button class="btn ghost" data-act="prompt">${t("r.tools.prompt")}</button><button class="btn ghost" data-act="go" data-to="settings">${t("r.tools.code")}</button><button class="btn ghost" data-act="go" data-to="settings">${t("r.tools.edit")}</button></div>
-    ${UI.showPrompt?`<p class="note">${t("r.tools.prompt_warn")}</p><textarea id="prompt-ta" readonly style="word-break:normal">${esc(llmPrompt())}</textarea><div class="row"><button class="btn" data-act="copy" data-src="prompt-ta">${t("common.copy")}</button></div>`:""}</section>`);
+  return {S, blocks, anyAnswer, gasAnswered, tops, ranked, notable, ym};
+}
+/* ---------- tabs: Главная · Темы · Пара · Я (docs/design-guide.md, «Разделы») ---------- */
+const TAB_ICON = {
+  result:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  mods:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="11" height="15" rx="2"/><path d="M9 3h9a2 2 0 0 1 2 2v12"/></svg>',
+  pair:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.5 4-5 7-5s5.8 1.5 7 5"/></svg>'
+};
+const LOCK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const TABS = [["result","tab.home"],["mods","tab.topics"],["pair","tab.pair"],["settings","tab.me"]];
+// every screen that lives inside a tab; anything else (questions, decks, pause, help, onboarding) is shown without the tab bar
+const TAB_OF = {result:"result", prof:"result", mods:"mods", modres:"mods", pair:"pair", pairlink:"pair", pairmatch:"pair", invite:"pair", ideas:"pair", plan:"pair", myguessres:"pair", settings:"settings", docs:"settings"};
+function tabsOn(){ return consented() && UI.resultSeen && !locked && !!TAB_OF[UI.screen] && !(UI.screen==="docs" && UI.docsFrom!=="settings"); }
+function canInvite(){ return hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only"; }
+function pairReady(){ return !!(G?.partner && coreDone() && G.partner.core); }
+function topicsDot(){ return MODS.some(m=>!modTopicHidden(m) && modState(m)==="started") || (!!P.modules.core_explicit && !UI.lvl3Seen); }
+function pairDot(){ return !!(partnerQ() && !G?.guess?.a_seen) || (pairReady() && !UI.matchSeen); }
+function tabBar(){
+  const cur = TAB_OF[UI.screen];
+  const dot = k => (k==="mods" && topicsDot()) || (k==="pair" && pairDot());
+  return `<nav class="tabbar" aria-label="${esc(t("tab.nav"))}">${TABS.map(([to,label])=>`<button class="tb" data-act="tab" data-to="${to}" ${cur===to?'aria-current="page"':""}>${dot(to)?`<span class="dot" role="img" aria-label="${esc(t("tab.dot"))}"></span>`:""}${TAB_ICON[to]}<span>${t(label)}</span></button>`).join("")}</nav>`
+    + (UI.tabsCoach ? "" : `<div class="coach" role="status"><b>${t("tabs.coach.t")}</b><p>${t("tabs.coach")}</p><button data-act="coachok">${t("tabs.coach.ok")}</button></div>`);
+}
+const lockBtn = () => P.settings.pin ? `<button class="act" data-act="locknow" aria-label="${esc(t("home.lock"))}">${LOCK_ICON}</button>` : "";
+function pairCounts(){
+  if(!pairReady()) return null;
+  const R = pairMatches();
+  return {y:R.sections.reduce((a,x)=>a+x.yes.length+x.lines.filter(l=>l.c!=="maybe").length,0), m:R.sections.reduce((a,x)=>a+x.maybe.length+x.lines.filter(l=>l.c==="maybe").length,0)};
+}
 
+/* Главная: the next step, a short portrait (each line opens its own screen), progress */
+function homeView(){
+  const X = profBlocks(), S = X.S;
+  const nobody = P.orientation.attracted_to.includes("nobody");
+  const xDone = !!P.modules.core_explicit, xVisible = SCR.x2.items.concat(SCR.x3.items).some(itemVisible);
+  const pc = pairCounts();
+  // one next step, most concrete first
+  let nx = null;
+  const started = MODS.find(m=>!modTopicHidden(m) && modState(m)==="started");
+  if(started) nx = {t:t("home.next.cont",{m:t("mod."+started)}), d:t("home.next.cont_d"), act:`data-act="openmod" data-m="${started}"`};
+  else if(pc && !UI.matchSeen) nx = {t:t("home.next.match"), d:t("home.next.match_d"), act:`data-act="go" data-to="pairmatch"`};
+  else if(canInvite() && !G?.invite?.sent_at && !G?.partner) nx = {t:t("home.next.invite"), d:t("home.next.invite_d"), act:`data-act="go" data-to="invite"`};
+  else if(xVisible && !xDone && !nobody) nx = {t:t("r.x.title"), d:t("home.next.x_d"), act:`data-act="extra"`, x:true};
+  else { const m = recommendModules().top.find(m=>modState(m)==="new"); if(m) nx = {t:t("home.next.try",{m:t("mod."+m)}), d:t("mod.d."+m), act:`data-act="openmod" data-m="${m}"`}; }
+  const next = nx ? `<button class="nextcard" ${nx.act}><h3>${t("home.next")}</h3><b>${esc(nx.t)}</b><span class="small muted">${esc(nx.d)}</span><span class="go">${t("home.next.go")}</span></button>` : "";
+  const xCard = xVisible && !xDone && !nx?.x ? `<section class="card res"><h3>${t("r.x.title")}</h3><p>${nobody?t("r.x.ace"):t("r.x.text")}</p><div class="row"><button class="btn ghost" data-act="extra">${t("r.x.start")}</button></div></section>` : "";
+  // short portrait
+  const list = a => a.join(", ").toLowerCase();
+  const brk = X.ranked.slice(0,2).filter(([k])=>X.notable(k)).map(([k])=>t("brk."+k));
+  const ny = Object.values(X.ym).reduce((a,g)=>a+g.y.length,0), nm = Object.values(X.ym).reduce((a,g)=>a+g.m.length,0);
+  const sum = {
+    gas: X.tops.length ? t("home.sum.gas",{list:list(X.tops.map(([k])=>t("ch."+k)))}) : X.gasAnswered ? t("r.gas.none") : t("home.sum.none"),
+    brakes: !X.ranked.length ? t("home.sum.none") : brk.length ? t("home.sum.brakes",{list:list(brk)}) : t("home.sum.brakes_calm"),
+    style: Object.keys(S.axes).length ? t("home.sum.style") : t("home.sum.none"),
+    interests: ny+nm ? t("home.sum.int",{y:ny, m:nm}) : t("home.sum.none")
+  };
+  const brief = `<section class="stack" style="gap:8px"><h3>${t("home.brief")}</h3><div class="rows">${["gas","brakes","style","interests"].map(k=>
+    `<button data-act="prof" data-k="${k}"><span class="tl"><b>${t("r."+k)}</b><span class="small muted">${esc(sum[k])}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div></section>`;
+  // progress
+  const vis = MODS.filter(m=>!modTopicHidden(m));
+  const pairSt = pc ? t("home.prog.pair_n",{n:pc.y}) : G?.invite?.sent_at || G?.partner ? t("home.prog.pair_wait") : t("home.prog.pair_none");
+  const prog = `<section class="stack" style="gap:8px"><h3>${t("home.progress")}</h3><div class="rows">
+    <button data-act="go" data-to="settings"><span>${t("home.prog.core")}</span><span class="r">${P.modules.core?.done?t("home.prog.core_done"):t("home.prog.core_todo")}</span></button>
+    <button data-act="tab" data-to="mods"><span>${t("home.prog.mods")}</span><span class="r">${t("home.prog.mods_n",{n:vis.filter(modDone).length, k:vis.length})}</span></button>
+    <button data-act="tab" data-to="pair"><span>${t("home.prog.pair")}</span><span class="r">${pairSt}</span></button></div></section>`;
   const name = P.identity.name ? esc(P.identity.name) : "";
-  const main = G?.partner ? goBtn("pair", t("r.pair.open")) : hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only" && !G?.invite?.sent_at ? goBtn("invite", t("r.invite.open")) : goBtn("mods", t("r.next.all"));
-  return topBar(name||t("app.name"), {to:"welcome", right:barLink("settings", t("common.settings"))}) + `<div class="pg"><header class="screen"><h2 style="font-size:44px">${t("r.title")}</h2>
-    <p class="note">${t("r.disclaimer")}</p></header>
-    ${anyAnswer?"":`<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`}${blocks.join("")}</div>` +
-    dock(main, helpLink());
+  return topBar(t("app.name"), {noBack:true, right:lockBtn()}) + pg(`<header class="screen"><h2>${name?t("home.hi",{name}):t("home.hi_anon")}</h2><p class="note">${t("r.disclaimer")}</p></header>` +
+    (X.anyAnswer ? "" : `<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`) +
+    next + brief + xCard + (X.blocks.safety||"") + prog);
+}
+function profView(){
+  const k = ["gas","brakes","style","interests"].includes(UI.profSec) ? UI.profSec : "gas";
+  const X = profBlocks();
+  return topBar(t("r.title"), {to:"result"}) + pg(`<header class="screen"><h2>${t("r."+k)}</h2><p class="note">${t("r.disclaimer")}</p></header>` + X.blocks[k]);
+}
+
+/* Игра вдвоём: one ladder of steps, each step is its own screen */
+function pairView(){
+  const p = G?.partner, ready = pairReady(), pc = pairCounts(), inv = canInvite();
+  const step = (n, cls, title, sub, to, off=false) => `<button class="step ${cls}" ${off?"disabled":`data-act="go" data-to="${to}"`}><i>${cls==="ok"?"✓":n}</i><span class="tl"><b>${esc(title)}</b><span class="small muted">${esc(sub)}</span></span>${off?"<span></span>":`<span class="chev" aria-hidden="true">›</span>`}</button>`;
+  let n = 0; const steps = [];
+  if(inv) steps.push(step(++n, G?.invite?.sent_at||p?"ok":"now", t("pair.st.invite"), G?.invite?.sent_at?t("pair.st.invite_sent"):t("pair.st.invite_d"), "invite"));
+  steps.push(step(++n, p?"ok":(!inv||G?.invite?.sent_at)?"now":"", t("pair.st.link"), p?t("pair.st.link_ok"):G?.role==="invitee"?t("pair.st.link_mine"):t("pair.st.link_d"), "pairlink"));
+  steps.push(step(++n, ready&&!UI.matchSeen?"now":"", t("pair.st.match"), pc?t("pair.st.match_n",{n:pc.y}):p&&!ready?t("pair.wait_core"):t("pair.st.match_wait"), "pairmatch", !p));
+  steps.push(step(++n, "", t("pair.st.ideas"), t("pair.st.ideas_d"), "ideas", !ready));
+  steps.push(step(++n, "", t("pair.st.plan"), t("pair.st.plan_d"), "plan", !ready));
+  const guess = inv && (G?.invite?.sent_at || partnerQ()) ? `<section class="card"><h3>${t("pair.st.guess")}</h3><p class="small muted">${partnerQ()&&!G.guess.a_seen?t("pair.st.guess_ready"):t("pair.st.guess_d")}</p>
+    <div class="row"><button class="btn ghost" data-act="go" data-to="${G.guess.a_seen&&partnerQ()?"myguessres":"myguess"}">${partnerQ()&&!G.guess.a_seen?t("myguess.ready_btn"):t("myguess.btn")}</button></div></section>` : "";
+  const tabs = tabsOn();
+  return topBar(t("pair.title"), tabs ? {noBack:true} : {to:"welcome"}) + pg(head("", p ? t("pair.title_with") : t("pair.title"), t("pair.lead")) + `<div class="ladder">${steps.join("")}</div>` + guess) +
+    (tabs ? "" : dock(goBtn("welcome", t("pause.back")), helpLink()));
+}
+function pairMatchView(){
+  const X = pairParts();
+  if(X.ready && !UI.matchSeen){ UI.matchSeen = true; save(); }
+  return topBar(t("pair.title"), {to:"pair"}) + pg(head("", t("pair.title_with"), "") + (X.p ? X.compare : `<p class="muted">${t("pair.st.match_wait")}</p>`)) +
+    (X.ready ? dock(goBtn("plan", t("plan.open")), subLink("ideas", t("idea.open")) + helpLink()) : dock(goBtn("pairlink", t("pair.st.link"))));
+}
+function pairLinkView(){
+  const X = pairParts();
+  return topBar(t("pair.title"), {to:"pair"}) + pg(head("", t("pair.link.title"), "") + X.add + X.myCode + (coreDone() ? revealCard() : "")) +
+    (X.p ? dock(goBtn("pairmatch", t("pair.st.match"))) : "");
 }
 function llmPrompt(){
   neutralPartner = true;
@@ -2521,26 +2695,32 @@ function profileCode(){
 function settingsView(){
   const stepBtns = SCREENS.filter(s=>s.step && !s.extra && screenVisible(s)).map(s=>`<button data-act="go" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t({identity:"id.title",body_early:"be.title",orient:"or.title",rel:"rel.title"}[s.id])}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("")
     + (P.modules.core_explicit||UI.extraFlow ? SCREENS.filter(s=>s.extra).map(s=>`<button data-act="goextra" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t("bl.title")}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("") : "");
-  const home = UI.resultSeen ? "result" : (UI.settingsFrom||"welcome");
-  return topBar("", {to:home}) + `<div class="pg">${head("", t("set.title"), "")}
-    <section class="card"><h3>${t("set.steps")}</h3><div class="steps-list">${stepBtns}</div></section>
-    <section class="card"><h3>${t("set.modules")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("mods.all")}</button></div></section>
+  const home = UI.resultSeen ? "result" : (UI.settingsFrom||"welcome"), tabs = tabsOn();
+  const sec = (title, body) => `<section class="stack" style="gap:8px"><h3>${title}</h3>${body}</section>`;
+  const privacy = sec(t("set.privacy"),
+    (P.settings.pin ? `<div class="rows"><button data-act="locknow"><span class="tl"><b>${t("set.lock_now")}</b><span class="small muted">${t("set.lock_now_d")}</span></span><span class="chev" aria-hidden="true">›</span></button></div>` : "") +
+    `<section class="card"><h3>${t("set.pin")}</h3>${P.settings.pin?`<p>${t("set.pin_on")}</p><div class="row"><button class="btn ghost" data-act="rmpin">${t("set.pin_remove")}</button></div>`:`<p class="small muted">${t("p.lead")}</p>${pinSetter()}`}</section>
     <section class="card">${hiddenTopicsField()}</section>
-    <section class="card"><h3>${t("set.pair")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title")}</button></div></section>
     <section class="card"><h3>${t("set.share")}</h3><div class="chips">
       <button class="chip" aria-pressed="${P.share_prefs.axes}" data-act="sharetoggle" data-k="axes">${t("set.share_axes")}</button>
-      <button class="chip" aria-pressed="${P.share_prefs.brakes}" data-act="sharetoggle" data-k="brakes">${t("set.share_brakes")}</button></div></section>
-    <section class="card"><h3>${t("set.pin")}</h3>${P.settings.pin?`<p>${t("set.pin_on")}</p><div class="row"><button class="btn ghost" data-act="rmpin">${t("set.pin_remove")}</button></div>`:`<p class="small muted">${t("p.lead")}</p>${pinSetter()}`}</section>
-    <section class="card"><h3>${t("set.code")}</h3><p class="small muted">${t("set.code_lead")}</p><p class="note">${t("r.tools.code_warn")}</p>
+      <button class="chip" aria-pressed="${P.share_prefs.brakes}" data-act="sharetoggle" data-k="brakes">${t("set.share_brakes")}</button></div></section>`);
+  const answers = sec(t("set.answers"), `<section class="card"><details><summary>${t("set.steps")}</summary><div class="steps-list" style="padding-top:8px">${stepBtns}</div></details></section>` +
+    (tabs ? "" : `<section class="card"><h3>${t("set.modules")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("mods.all")}</button></div></section>
+    <section class="card"><h3>${t("set.pair")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title")}</button></div></section>`));
+  const data = sec(t("set.data"), (UI.resultSeen ? `<section class="card"><h3>${t("r.tools.prompt")}</h3><p class="small muted">${t("set.prompt_d")}</p>
+      ${UI.showPrompt?`<p class="note">${t("r.tools.prompt_warn")}</p><textarea id="prompt-ta" readonly style="word-break:normal">${esc(llmPrompt())}</textarea><div class="row"><button class="btn" data-act="copy" data-src="prompt-ta">${t("common.copy")}</button></div>`
+        :`<div class="row"><button class="btn ghost" data-act="prompt">${t("r.tools.prompt")}</button></div>`}</section>` : "") +
+    `<section class="card"><h3>${t("set.code")}</h3><p class="small muted">${t("set.code_lead")}</p><p class="note">${t("r.tools.code_warn")}</p>
       <textarea id="code-ta" readonly>${esc(profileCode())}</textarea><div class="row"><button class="btn ghost" data-act="copy" data-src="code-ta">${t("common.copy")}</button></div>
       <label class="q" for="import-ta">${t("set.import")}</label><textarea id="import-ta" placeholder="${t("set.import_ph")}"></textarea>
       <div class="row"><button class="btn ghost" data-act="import">${t("set.import_btn")}</button><span class="err" id="import-msg" role="alert"></span></div>
       ${pendingImport?`<div class="flag"><p>${t("set.import_confirm")}</p><div class="row"><button class="btn" data-act="importyes">${t("set.import_yes")}</button><button class="btn ghost" data-act="importno">${t("set.import_no")}</button></div></div>`:""}
-      <details><summary class="small muted">${t("set.json")}</summary><textarea id="json-ta" readonly style="min-height:220px">${esc(JSON.stringify(P,null,2))}</textarea></details></section>
-    <section class="card"><h3>${t("doc.title")}</h3><div class="row"><button class="btn link" data-act="go" data-to="docs">${t("t.read")}</button></div></section>
-    <section class="card"><h3>${t("set.delete")}</h3><p class="small muted">${t("set.delete_lead")}</p>
-      ${UI.askWipe?`<button class="btn" data-act="wipe">${t("set.delete_confirm")}</button>`:`<button class="btn ghost" data-act="askwipe">${t("set.delete")}</button>`}</section></div>` +
-    dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")));
+      <details><summary class="small muted">${t("set.json")}</summary><textarea id="json-ta" readonly style="min-height:220px">${esc(JSON.stringify(P,null,2))}</textarea></details></section>`);
+  const about = sec(t("set.about"), `<div class="rows"><button data-act="go" data-to="docs"><span>${t("doc.title")}</span><span class="chev" aria-hidden="true">›</span></button><button data-act="go" data-to="help"><span>${t("common.help")}</span><span class="chev" aria-hidden="true">›</span></button></div>`);
+  const wipe = `<section class="card"><h3>${t("set.delete")}</h3><p class="small muted">${t("set.delete_lead")}</p>
+      ${UI.askWipe?`<button class="btn" data-act="wipe">${t("set.delete_confirm")}</button>`:`<button class="btn ghost" data-act="askwipe">${t("set.delete")}</button>`}</section>`;
+  return topBar("", tabs ? {noBack:true} : {to:home}) + pg(head("", t("set.title"), "") + privacy + answers + data + about + wipe) +
+    (tabs ? "" : dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back"))));
 }
 
 /* ---------- PIN (lock only, answers stay unencrypted) ---------- */
@@ -2705,19 +2885,20 @@ function modIntro(m){
 }
 function modTile(m){
   const st = modState(m);
-  return `<button class="tile l${MOD_LVL[m]}" data-act="openmod" data-m="${m}"><span class="tl"><b>${t("mod."+m)}</b><span class="small muted">${t("mod.d."+m)}</span></span><span class="st ${st}">${t("mods.st."+st)}</span></button>`;
+  return `<button class="tile l${MOD_LVL[m]}" data-act="${st==="done"?"modres":"openmod"}" data-m="${m}"><span class="tl"><b>${t("mod."+m)}</b><span class="small muted">${t("mod.d."+m)}</span></span><span class="st ${st}">${t("mods.st."+st)}</span></button>`;
 }
 function modsView(){
   const coreSeen = UI.resultSeen;
   const vis = MODS.filter(m=>!modTopicHidden(m));
   const decks = [1,2,3].map(l=>{ const ms = vis.filter(m=>MOD_LVL[m]===l); if(!ms.length) return "";
     return `<section class="stack" style="gap:8px"><h3>${t("mods.lvl."+l)}</h3><div class="tiles">${ms.map(modTile).join("")}</div></section>`; }).join("");
-  const home = UI.resultSeen ? "result" : "welcome";
-  return topBar("", {to:home}) + pg(head("", t("mods.title"), t("mods.lead")) +
+  const home = UI.resultSeen ? "result" : "welcome", tabs = tabsOn();
+  if(P.modules.core_explicit && !UI.lvl3Seen){ UI.lvl3Seen = true; save(); }
+  return topBar("", tabs ? {noBack:true} : {to:home}) + pg(head("", t("mods.title"), t("mods.lead")) +
     (coreSeen ? "" : `<p class="note">${t("mods.after_core")}</p>`) +
     (coreSeen && !P.modules.core_explicit ? `<p class="small muted">${t("mods.lvl3_later")}</p>` : "") + decks +
     (vis.length<MODS.length ? `<p class="small muted">${t("mods.hidden")}</p>` : "")) +
-    dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")));
+    (tabs ? "" : dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back"))));
 }
 function modGateView(){
   const m = UI.mod, g = P.modules[m]?.gate;
@@ -2807,7 +2988,7 @@ function modResView(){
   const m = UI.mod;
   return topBar(t("mod."+m), {to:"mods"}) + pg(head(t("mod.done_title"), t("mod.res."+m), "") + `<p class="note">${t("r.disclaimer")}</p>
     <section class="card res">${modSummary(m)}</section>`) +
-    dock(goBtn("result", t("common.to_result")), `<button class="btn link small" data-act="openmod" data-m="${m}" data-edit="1">${t("mod.edit")}</button>${subLink("mods", t("mod.to_list"))}`);
+    dock(`<button class="btn wide ghost" data-act="openmod" data-m="${m}" data-edit="1">${t("mod.edit")}</button>`);
 }
 
 /* ---------- group wp-group/1: invite, guess, pair comparison (spec 14) ---------- */
@@ -2944,7 +3125,7 @@ function inviteView(){
   const c = guessCandidates(), sel = inviteSel();
   const status = G?.partner ? t("inv.st.started") : G?.invite?.sent_at ? t("inv.st.waiting") : "";
   const chips = c.map(id=>`<button class="chip" aria-pressed="${sel.includes(id)}" data-act="invsel" data-id="${id}">${esc(qText(id))} · <span class="muted">${t("opt.yn."+["no","maybe","yes"][P.answers[id]])}</span></button>`).join("");
-  return topBar(t("pair.title"), {to:"result"}) + `<div class="pg">` + head("", t("inv.title"), t("inv.lead")) +
+  return topBar(t("pair.title"), {to:"pair"}) + `<div class="pg">` + head("", t("inv.title"), t("inv.lead")) +
     (status ? `<p class="note">${status}</p>` : "") +
     `<section class="card"><h3>${t("inv.step1")}</h3><p class="small muted">${t("inv.step1_lead")}</p>
       ${c.length ? `<div class="chips">${chips}</div><p class="small ${sel.length<10?"":"muted"}">${t("inv.count",{n:sel.length})}${sel.length<10?" "+t("inv.few"):""}</p>` : `<p class="muted">${t("inv.none")}</p>`}</section>
@@ -2952,7 +3133,7 @@ function inviteView(){
       <p class="small muted">${t("inv.text_note")}</p></section>
     <section class="card"><h3>${t("inv.step3")}</h3><p class="note">${t("inv.link_note")}</p><p class="small muted">${t("inv.patience")}</p></section>
     ${G?.invite?.sent_at ? `<section class="card"><h3>${t("myguess.step")}</h3><p class="small muted">${t("myguess.step_lead")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="myguess">${t("myguess.btn")}</button></div></section>` : ""}</div>` +
-    dock(dockBtn("invcopy", t("inv.copy"), sel.length?"":"disabled"), subLink("pair", t("pair.title")) + subLink("result", t("common.to_result")));
+    dock(dockBtn("invcopy", t("inv.copy"), sel.length?"":"disabled"), tabsOn() ? "" : subLink("pair", t("pair.title")));
 }
 // guess games: one card at a time, then a short wrap-up before the result
 function deckPage(key, ids_, vals, act, {title, eyebrow, lead, done, doneLabel, locked=false}){
@@ -3033,7 +3214,7 @@ function pairMatches(){
   out.sections = out.sections.filter(s=>s.yes.length||s.maybe.length||s.lines.length||s.info.length);
   return out;
 }
-function pairView(){
+function pairParts(){
   const p = G?.partner;
   let compare = "";
   if(p){
@@ -3073,10 +3254,8 @@ function pairView(){
       <div class="row"><button class="btn ghost" data-act="pairimport">${t("pair.add_btn")}</button><span class="err" id="pimp-msg" role="alert"></span></div>
       ${pendingPair?`<div class="flag"><p>${t("pair.confirm")}</p><div class="row"><button class="btn" data-act="pairyes">${t("pair.confirm_yes")}</button><button class="btn ghost" data-act="pairno">${t("set.import_no")}</button></div></div>`:""}
       ${p?`<p class="small muted">${t("pair.received")}</p><div class="row"><button class="btn link small" data-act="pairdel">${t("pair.delete")}</button></div>`:""}</section>`;
-  const inv = G?.role!=="invitee" && hasPartner() ? `<div class="row"><button class="btn ghost" data-act="go" data-to="invite">${t("inv.title")}</button>${G?.invite?.sent_at||partnerQ()?`<button class="btn ghost" data-act="go" data-to="${G.guess.a_seen&&partnerQ()?"myguessres":"myguess"}">${partnerQ()&&!G.guess.a_seen?t("myguess.ready_btn"):t("myguess.btn")}</button>`:""}</div>` : "";
-  const home = UI.resultSeen ? "result" : "welcome", ready = p && coreDone() && p.core;
-  return topBar(t("pair.title"), {to:home}) + pg(head("", p ? t("pair.title_with") : t("pair.title"), t("pair.lead")) + compare + myCode + (coreDone() ? revealCard() : "") + add + inv) +
-    dock(ready ? goBtn("plan", t("plan.open")) : goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back")), (ready ? subLink("ideas", t("idea.open")) : "") + helpLink());
+  const ready = p && coreDone() && p.core;
+  return {p, compare, myCode, add, ready};
 }
 
 /* ---------- ideas and plan for a pair (spec 14.3, 15) ---------- */
@@ -3377,10 +3556,12 @@ function revealCard(){
 /* ---------- render ---------- */
 const app = document.getElementById("app");
 function render(){
-  if(locked){ app.innerHTML = VIEWS.lock(); setTimeout(()=>document.getElementById("pin-in")?.focus(),0); return; }
+  if(locked){ document.body.classList.remove("tabs"); app.innerHTML = VIEWS.lock(); setTimeout(()=>document.getElementById("pin-in")?.focus(),0); return; }
   if(!consented() && !["welcome","terms","under18","help","docs","later"].includes(UI.screen)){ UI.screen="welcome"; }
   const s = SCR[UI.screen];
-  app.innerHTML = s && s.kind==="items" ? itemsView(s) : (VIEWS[UI.screen]||(UI.screen==="story"?VIEWS.result:VIEWS.welcome))();
+  const tabs = tabsOn();
+  app.innerHTML = (s && s.kind==="items" ? itemsView(s) : (VIEWS[UI.screen]||(UI.screen==="story"?VIEWS.result:VIEWS.welcome))()) + (tabs ? tabBar() : "");
+  document.body.classList.toggle("tabs", tabs);
   bindCard();
   if(FORMS[UI.screen] && app.querySelector(".dock") && app.querySelector(".chat .msg.new")) requestAnimationFrame(()=>window.scrollTo(0, document.body.scrollHeight));
 }
@@ -3430,6 +3611,11 @@ app.addEventListener("click", async e=>{
       return go(to);
     }
     case "goextra": UI.extraFlow = true; return go(b.dataset.to);
+    case "tab": UI.tabsCoach = true; UI.askWipe = false; if(b.dataset.to==="settings") UI.settingsFrom = "result"; return go(b.dataset.to);
+    case "coachok": UI.tabsCoach = true; save(); return rerender();
+    case "prof": UI.profSec = b.dataset.k; return go("prof");
+    case "modres": UI.mod = b.dataset.m; return go("modres");
+    case "locknow": if(P.settings.pin){ locked = true; UI.showPrompt = false; save(); render(); window.scrollTo(0,0); } return;
     case "term": { const k=b.dataset.k; const cur = b.getAttribute("aria-checked")==="true"; UI.draftTerms[k] = !cur; return rerender(); }
     case "accept": {
       P.consent = {age18:true, terms:TERMS_VERSION, data:true, not_diagnosis:true, at:now()};
@@ -3641,7 +3827,7 @@ app.addEventListener("click", async e=>{
     if(G && G.group_id===r.data.g && G.role==="inviter"){ setTimeout(()=>toast(t("pair.invite_own")),0); return; }
     pendingInvite = r.data; UI.screen = "welcome";
   } else if(r.kind==="pair"){
-    pendingPair = r.data; if(consented()) UI.screen = "pair";
+    pendingPair = r.data; if(consented()) UI.screen = UI.resultSeen ? "pairlink" : "pair";
   }
 })();
 render();
