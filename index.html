@@ -28,6 +28,7 @@ if(/[?&]reset\b/.test(location.search) && "serviceWorker" in navigator){
   --cta-grad:linear-gradient(180deg,#F08DB0,#D9608B);
   --display:"Cormorant Garamond", "Times New Roman", Georgia, serif;
   --body:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --chev:8px;
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -36,7 +37,7 @@ body{background:radial-gradient(120% 50% at 85% -10%,#5A1F38 0%,rgba(90,31,56,0)
   color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100%;
   padding-left:max(18px, env(safe-area-inset-left, 0px));padding-right:max(18px, env(safe-area-inset-right, 0px));padding-block:0 40px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
-.wrap{max-width:560px;margin:0 auto;display:grid;gap:18px}
+.wrap{max-width:560px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
 h1,h2,h3{text-wrap:balance;margin:0}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(48px,14vw,64px);line-height:.92;letter-spacing:-.01em}
 h1 em{font-style:italic;font-weight:500;color:var(--accent);display:block}
@@ -61,13 +62,13 @@ button:disabled{cursor:not-allowed;opacity:.45}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .row.end{justify-content:space-between}
 /* top bar */
-.bar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:linear-gradient(var(--bg) 75%,rgba(20,11,16,0));padding-block:10px 12px;display:grid;gap:6px;margin-bottom:-6px}
+.bar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;grid-template-columns:minmax(0,1fr);background:linear-gradient(var(--bg) 75%,rgba(20,11,16,0));padding-block:10px 12px;display:grid;gap:6px;margin-bottom:-6px}
 .bar .row{justify-content:space-between;font-size:13px;color:var(--muted);flex-wrap:nowrap}
 .bar .lbl{flex:1;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track{height:3px;background:#3E2A34;border-radius:3px;overflow:hidden}
 .fill{height:100%;background:var(--accent);width:0;transition:width .25s}
 .bar .stop{min-height:44px;font-size:13px;color:var(--muted);padding:0 2px}
-.bar .back{min-height:44px;font-size:14px;color:var(--fg);padding:0 2px}
+.bar .back{min-height:44px;font-size:14px;color:var(--fg);padding:0 2px;white-space:nowrap}
 header.screen{padding-top:18px;display:grid;gap:10px}
 .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:600}
 /* question rows (settings, modules) */
@@ -96,6 +97,7 @@ header.screen{padding-top:18px;display:grid;gap:10px}
 .chip{min-height:44px;padding:9px 16px;border-radius:999px;border:1px solid #4A2F3B;background:#1E1218;font-size:15px;text-align:left}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
 .chip[aria-pressed="true"] .muted{color:var(--accent-ink);opacity:.75}
+.chip.more{border-style:dashed;color:var(--muted)}
 .chip .soon{font-size:12px;color:var(--muted);margin-left:6px}
 input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 textarea{min-height:120px;font-size:13px;word-break:break-all}
@@ -140,9 +142,9 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .sugg[id]{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent);padding-right:40px}
 .sugg::-webkit-scrollbar{display:none}
 .sugg .chip{flex:none;white-space:nowrap}
-.cfield{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 6px 6px 14px;border-radius:24px;border:1px solid #4A2F3B;background:#1E1218}
+.cfield{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 6px 2px 14px;border-radius:24px;border:1px solid #4A2F3B;background:#1E1218}
 .cfield:focus-within{border-color:var(--accent)}
-.cfield input{flex:1;min-width:8em;border:0;background:none;padding:6px 0;min-height:0;outline:none;font:inherit;font-size:16px;color:var(--fg)}
+.cfield input{flex:1;min-width:8em;border:0;background:none;padding:0;min-height:44px;outline:none;font:inherit;font-size:16px;color:var(--fg)}
 .tok{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
 .nomatch{margin:0;text-align:right}
 @media (prefers-reduced-motion: reduce){.dock{transition:none}}
@@ -223,7 +225,12 @@ textarea{min-height:120px;font-size:13px;word-break:break-all}
 .pin input{max-width:10em;letter-spacing:.3em;font-variant-numeric:tabular-nums}
 .cols{display:grid;gap:10px;width:100%}
 .col{display:grid;gap:4px}
-summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+summary{min-height:44px;display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+/* disclosure chevron: a folded group never looks like an empty card; turns when open */
+summary::after{content:"";flex:none;margin-left:auto;width:var(--chev);height:var(--chev);border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .2s ease}
+details[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+summary .cnt{font-size:13px;color:var(--muted);font-weight:500;padding:2px 9px;border-radius:999px;border:1px solid var(--line)}
 /* modules one per screen */
 .qone .item{padding:0;border:0}
 .qone .item>.q,.qone .item>.hint{display:none}
@@ -239,10 +246,10 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
 /* pair */
 /* shared frame outside the question flow: the same top bar, a body, a solid dock with the main action */
 .wrap:has(> .dock) > .dock{align-self:end}
-body:has(.dock){padding-bottom:0}
+body:has(.dock),body:has(.qpage){padding-bottom:0}
 .wrap:has(> .dock){min-height:100svh}
 .bar.plain{padding-bottom:4px}
-.bar.plain .row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px}
+.bar.plain .row{display:grid;grid-template-columns:1fr minmax(0,max-content) 1fr;gap:8px}
 .bar.plain .row>.back{justify-self:start}
 .bar.plain .row>.rt,.bar.plain .row>.sp{justify-self:end;white-space:nowrap}
 .bar .lbl{min-width:0}
@@ -254,7 +261,16 @@ body:has(.dock){padding-bottom:0}
 .dock .pin{justify-content:flex-end}
 .dock .pin input{max-width:none;flex:1}
 .err{color:var(--maybe)!important;font-size:14px}
-.checks .check{background:var(--surface)}
+.checks{gap:8px}
+.checks .check{background:var(--surface);padding:10px 14px;min-height:44px;font-size:14px;line-height:1.35;gap:10px}
+.checks .check .box{margin-top:0}
+/* terms: hints fold under «Подробнее» so all four checks stay above the dock on 360×740 */
+.tmore .tips{padding-bottom:4px}
+/* second-plan links at the end of a hub page: the dock keeps only the main button */
+.pgmore{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;padding-top:4px}
+.pgmore .btn.link{color:var(--muted);font-size:14px}
+.progline{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--muted)}
+.progline b{color:var(--fg);font-weight:500}
 .msg b{font-weight:600}
 .msg .sm,.msg.in .muted{font-size:14px}
 .msg .sm{display:block;color:var(--muted);margin-top:4px}
@@ -280,7 +296,7 @@ body.tabs .dock{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));padd
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(20,11,16,.97);border-top:1px solid var(--line);
   padding:0 max(8px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(8px, env(safe-area-inset-left, 0px));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .tabbar>div{display:contents}
-.tb{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;height:calc(var(--tabh) - 1px);font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.02em}
+.tb{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;height:calc(var(--tabh) - 1px);font-size:13px;font-weight:500;color:var(--muted);letter-spacing:.02em}
 .tb svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .tb[aria-current="page"]{color:var(--accent)}
 .tb[aria-current="page"] svg{fill:var(--yes-bg)}
@@ -297,7 +313,7 @@ body.tabs .dock{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px));padd
 .rows{display:grid;background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:0 16px}
 .rows>*{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 0;border-bottom:1px solid var(--line);text-align:left;width:100%}
 .rows>*:last-child{border-bottom:0}
-.rows .tl{display:grid;gap:2px;min-width:0}
+.rows .tl{display:grid;gap:2px;min-width:0;flex:1}
 .rows b{font-weight:600}
 .rows .r{color:var(--muted);font-size:13px;white-space:nowrap}
 .rows .chev{color:var(--muted);font-size:18px}
@@ -366,13 +382,14 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "topic.anal": "Анальные ласки",
   "topic.fant": "Фантазии и роли",
   "t.title": "Прежде чем начать",
-  "t.lead": "Тема взрослая, данные личные, поэтому без этих отметок игра не начнётся и ничего не сохранится.",
+  "t.lead": "Тема взрослая, данные личные: без этих отметок игра не начнётся и ничего не сохранится.",
   "t.age": "Мне исполнилось 18 лет",
   "t.terms": "Принимаю условия использования",
-  "t.terms_hint": "Это ранняя версия условий. Как мы обращаемся с данными — в разделе «Условия и конфиденциальность».",
+  "t.terms_hint": "Ранняя версия условий. Про данные — по ссылке ниже.",
   "t.data": "Даю согласие на обработку моих ответов о сексуальной жизни, теле и ориентации на этом устройстве, чтобы получить результат",
-  "t.data_hint": "Это данные особой категории (GDPR, ст. 9). Ответы не уходят с устройства: уходит только то, что ты скопируешь и отправишь своими руками, например код для партнёра. Отозвать согласие можно в настройках: «Удалить все ответы».",
+  "t.data_hint": "Особая категория данных (GDPR, ст. 9). С устройства уходит только то, что ты своими руками скопируешь и отправишь. Отозвать согласие — «Удалить все ответы» в настройках.",
   "t.read": "Прочитать условия и политику конфиденциальности",
+  "t.more": "Подробнее",
   "t.diag": "Понимаю: результат — самооценка, а не диагноз и не медицинский совет. И всё, о чём здесь речь, — только по взаимному согласию",
   "t.under": "Мне нет 18",
   "u.title": "Эта игра только для взрослых",
@@ -390,15 +407,15 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "doc.who.t": "Кто отвечает",
   "doc.who": "Приложение делает разработчик «Профиля желаний». Имя или название компании и адрес появятся здесь до публичного запуска. Пока всё хранится на твоём устройстве, твои ответы к нам не попадают: мы их не видим, не храним и не можем прочитать.",
   "doc.data.t": "Какие данные и зачем",
-  "doc.data": "Ответы анкеты: что нравится, что мешает, тело, ориентация, формат отношений; по желанию — имя или псевдоним и имя партнёра; настройки вроде скрытых тем и PIN. Если партнёр прислал свой код, на устройстве хранится и то, чем он поделился для игры вдвоём и угадайки. Ответы — данные особой категории (GDPR, ст. 9). Нужны они только для одного: показать профиль и совпадения здесь, на устройстве.",
+  "doc.data": "Ответы анкеты: что нравится, что мешает, тело, ориентация, формат отношений; по желанию — имя или псевдоним и имя партнёра; настройки вроде скрытых тем и PIN. Если партнёр прислал свою ссылку, на устройстве хранится и то, чем он поделился для игры вдвоём и угадайки. Ответы — данные особой категории (GDPR, ст. 9). Нужны они только для одного: показать профиль и совпадения здесь, на устройстве.",
   "doc.consent.t": "Твоё согласие",
   "doc.consent": "Ответы о сексуальной жизни обрабатываются только с твоего явного согласия (GDPR, ст. 9(2)(a)). Это отдельная отметка среди условий перед началом игры. Без неё анкета не откроется, других последствий отказ не несёт. Отозвать согласие можно в любой момент: «Удалить все ответы» в настройках стирает профиль с устройства.",
   "doc.where.t": "Где хранятся и сколько",
   "doc.where": "Только на этом устройстве, в памяти браузера, пока ты их не удалишь или не очистишь браузер. Ответы никуда не отправляются, аналитики нет, сторонние сервисы приложение не вызывает. Сервер, с которого загружается приложение, видит обычные данные загрузки, например IP-адрес, но не ответы. PIN закрывает вход, но ответы не шифрует.",
   "doc.share.t": "Что может уйти с устройства",
-  "doc.share": "Только то, что копируешь своими руками: код профиля (в нём все ответы, имя или псевдоним и скрытые темы), код для партнёра (технически из него читается всё, что в нём перечислено, включая ответы для ответной угадайки, если ты их добавишь), ссылка-приглашение (выбранные тобой ответы для угадайки, без имён), план (совпадения и то, что важно партнёру после), запрос для ИИ-чата (сводка без имён). Скопированное проходит через буфер обмена и попадает туда, куда ты это вставишь, а ИИ-чат обрабатывает запрос по своим правилам.",
+  "doc.share": "Только то, что копируешь своими руками: код профиля (в нём все ответы, имя или псевдоним и скрытые темы), ссылка для партнёра (технически из неё читается всё, что в ней перечислено, включая ответы для ответной угадайки, если ты их добавишь), ссылка-приглашение (выбранные тобой ответы для угадайки, без имён), план (совпадения и то, что важно партнёру после), запрос для ИИ-чата (сводка без имён). Скопированное проходит через буфер обмена и попадает туда, куда ты это вставишь, а ИИ-чат обрабатывает запрос по своим правилам.",
   "doc.rights.t": "Твои права",
-  "doc.rights": "Все ответы и настройки видны в настройках, в разделе «Все ответы одним файлом», а забрать их можно кодом профиля. Имя партнёра хранится отдельно, его видно и можно стереть в разделе «Твои отношения»; данные партнёра стираются кнопкой «Удалить данные партнёра» на экране «Ваши совпадения» (в настройках — кнопка «Игра вдвоём»). Исправить ответы можно в любой момент, удалить всё — кнопкой «Удалить все ответы».",
+  "doc.rights": "Все ответы и настройки видны в настройках, в разделе «Все ответы одним файлом», а забрать их можно кодом профиля. Имя партнёра хранится отдельно, его видно и можно стереть в разделе «Твои отношения»; данные партнёра стираются кнопкой «Удалить данные партнёра» на экране «Обмен ссылками» в разделе «Игра вдвоём». Исправить ответы можно в любой момент, удалить всё — кнопкой «Удалить все ответы».",
   "doc.complaint.t": "Если что-то не так",
   "doc.complaint": "Если считаешь, что с твоими данными обошлись не по закону, можно пожаловаться в надзорный орган по защите данных своей страны. В Польше это UODO (Urząd Ochrony Danych Osobowych).",
   "doc.liability.t": "Ответственность",
@@ -533,7 +550,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "core.x3.title": "Ещё откровеннее",
   "core.x3.lead": "Насколько тебе это интересно? Всё здесь — только по договорённости заранее и со стоп-словом. Эту страницу можно пропустить целиком.",
   "core.x.private": "Партнёр увидит только то, чего хотите вы оба. Твои «Нет» и несовпавшие «Да» приложение не показывает.",
-  "core.x.code_caveat": "Но технически из кода для партнёра можно прочитать твои «Да» и «Может», зоны и уровни, а если ты добавишь в код ответы для угадайки — то и их, включая «Нет». Код профиля в настройках — резервная копия со всеми ответами: его никому не отправляй.",
+  "core.x.code_caveat": "Но технически из ссылки для партнёра можно прочитать твои «Да» и «Может», зоны и уровни, а если ты добавишь в неё ответы для угадайки — то и их, включая «Нет». Код профиля в настройках — резервная копия со всеми ответами: его никому не отправляй.",
   "core.skip_screen": "Пропустить страницу",
   "opt.yn.yes": "Да",
   "opt.yn.maybe": "Может",
@@ -657,6 +674,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "r.title.m": "Готово! Вот твой профиль",
   "r.title.f": "Готово! Вот твой профиль",
   "r.title.n": "Готово! Вот твой профиль",
+  "prof.bar": "Твой профиль",
   "r.disclaimer": "Это самооценка, а не диагноз. Она меняется со временем, и это нормально.",
   "r.empty": "Пока тут пусто: все вопросы пропущены. Из одних пропусков профиль не сложить — ответь хотя бы на часть, и он появится.",
   "r.empty.btn": "Вернуться к вопросам",
@@ -823,17 +841,20 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "help.spec": "Сексолог, психолог или семейный психолог помогают с желанием, болью, стыдом и разговорами в паре. Это обычный запрос.",
   "help.violence": "Если в отношениях тебя принуждают, унижают или тебе страшно, это насилие, и с ним можно обратиться за помощью: в местную службу помощи или по номеру экстренных служб, в ЕС это 112.",
   "help.stub": "Контакты служб по странам появятся в следующей версии.",
-  "set.title": "Настройки",
+  "set.title": "Твои настройки",
   "set.hide": "Скрытые темы",
   "set.pin": "PIN на вход",
   "set.pin_on": "PIN включён.",
   "set.pin_off": "PIN выключен.",
   "set.pin_remove": "Убрать PIN",
+  "set.pin_short": "включён",
+  "set.pin_on_row": "PIN включён",
   "set.share": "Что показывать партнёру в игре вдвоём",
   "set.share_axes": "Стиль",
   "set.share_brakes": "Что мешает",
   "set.code": "Код профиля",
   "set.code_lead": "Сохрани код, чтобы восстановить ответы на другом устройстве или после очистки браузера.",
+  "set.code_show": "Показать код",
   "set.import": "Восстановить из кода",
   "set.import_ph": "Вставь код профиля",
   "set.import_btn": "Восстановить",
@@ -846,7 +867,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "set.delete": "Удалить все ответы",
   "set.delete_confirm": "Да, удалить всё",
   "set.delete_lead": "Удалит с этого устройства профиль, имя партнёра, данные игры вдвоём и отметки согласия. Отменить нельзя.",
-  "set.steps": "Вернуться к вопросам",
+  "set.steps": "Изменить ответы",
   "opt.ynf.yes": "Да",
   "opt.ynf.fant": "Только как фантазия",
   "opt.ynf.no": "Нет",
@@ -928,7 +949,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "pair.pen.ij": "Ты проникаешь, {P} принимает",
   "pair.pen.ji": "{P} проникает, ты принимаешь",
   "mods.title": "Темы",
-  "mods.lead": "Выбирай любые и в любом порядке: от спокойных до очень откровенных. Каждая пройденная тема добавляет в профиль новую главу.",
+  "mods.lead": "Любые и в любом порядке. Каждая тема добавит главу в профиль.",
   "mods.lvl.1": "спокойно",
   "mods.lvl.2": "откровенно",
   "mods.lvl.3": "очень откровенно",
@@ -953,7 +974,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "mod.lvl_hint": "Это твой потолок для всей темы. В паре сработает меньший из двух.",
   "mod.caution": "осторожно",
   "mod.gentle": "бережно",
-  "mod.text_ph": "Необязательно. Видно только тебе: в код для партнёра не попадает.",
+  "mod.text_ph": "Необязательно. Видно только тебе: в ссылку для партнёра не попадает.",
   "mod.res.none": "Пока нет ответов «Да» или «Может».",
   "mod.res.lvl": "Потолок",
   "mod.res.after": "Что важно после",
@@ -1404,13 +1425,14 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "tip.anal.rim": "Барьер (салфетка из латекса или полиуретана, при аллергии на латекс — только полиуретан) снижает риск инфекций.",
   "tip.anal.sex": "Много смазки, медленно, презерватив. Обезболивающие и «расслабляющие» средства не использовать: боль — сигнал остановиться.",
   "inv.title": "Позвать партнёра",
-  "inv.lead": "Партнёр получит ссылку на угадайку: как ты ответил на несколько спокойных вопросов? А дальше, если захочется, — своя анкета.",
-  "inv.lead.m": "Партнёр получит ссылку на угадайку: как ты ответил на несколько спокойных вопросов? А дальше, если захочется, — своя анкета.",
-  "inv.lead.f": "Партнёр получит ссылку на угадайку: как ты ответила на несколько спокойных вопросов? А дальше, если захочется, — своя анкета.",
-  "inv.lead.n": "Партнёр получит ссылку на угадайку: какие у тебя ответы на несколько спокойных вопросов? А дальше, если захочется, — своя анкета.",
+  "inv.lead": "Партнёр угадает твои ответы на спокойные вопросы, а потом, если захочется, пройдёт свою анкету.",
+  "inv.lead.m": "Партнёр угадает твои ответы на спокойные вопросы, а потом, если захочется, пройдёт свою анкету.",
+  "inv.lead.f": "Партнёр угадает твои ответы на спокойные вопросы, а потом, если захочется, пройдёт свою анкету.",
+  "inv.lead.n": "Партнёр угадает твои ответы на спокойные вопросы, а потом, если захочется, пройдёт свою анкету.",
   "inv.step1": "1. Вопросы для угадайки",
-  "inv.step1_lead": "Только спокойные пункты. Эти ответы партнёр увидит полностью, включая «Нет». Убери то, что не хочется показывать.",
+  "inv.step1_lead": "Партнёр увидит эти ответы целиком, включая «Нет». Убери то, что не хочется показывать.",
   "inv.count": "Выбрано: {n}.",
+  "inv.more": "Ещё {n}",
   "inv.few": "Лучше 10–15: так интереснее.",
   "inv.none": "Пока нет ответов на спокойные вопросы. Они в начале главной части и в спокойных темах.",
   "inv.step2": "2. Текст приглашения",
@@ -1418,14 +1440,14 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "inv.text.m": "Нашёл игру для пар: угадаем пару мелочей друг про друга? Пара минут. Твои «нет» я не увижу: приложение показывает совпадения и то, чем захочешь поделиться. Если не хочется, можно просто не открывать.",
   "inv.text.f": "Нашла игру для пар: угадаем пару мелочей друг про друга? Пара минут. Твои «нет» я не увижу: приложение показывает совпадения и то, чем захочешь поделиться. Если не хочется, можно просто не открывать.",
   "inv.text.n": "Тут есть игра для пар: угадаем пару мелочей друг про друга? Пара минут. Твои «нет» я не увижу: приложение показывает совпадения и то, чем захочешь поделиться. Если не хочется, можно просто не открывать.",
-  "inv.text_note": "Текст можно поменять. В ссылке нет имён, а её содержимое не видно в превью. В ней лежат выбранные ответы для угадайки.",
+  "inv.text_note": "Текст можно поменять.",
   "inv.step3": "3. Отправить",
-  "inv.link_note": "Ссылка открывает приложение на устройстве партнёра. Сервера нет: ничего не уходит, пока партнёр сам не пришлёт тебе свой код.",
+  "inv.link_note": "В ссылке нет имён, только выбранные ответы, и в превью их не видно. Сервера нет: ссылка уходит только тому, кому ты её отправишь.",
   "inv.copy": "Скопировать текст и ссылку",
   "inv.copied": "Скопировано. Отправь так, как вам удобно.",
   "inv.patience": "Не торопи: пусть партнёр откроет, когда будет настроение.",
-  "inv.st.waiting": "Текст скопирован. Когда партнёр пришлёт свой код, вставь его в разделе «Игра вдвоём».",
-  "inv.st.started": "Код {P_gen} получен: можно смотреть совпадения.",
+  "inv.st.waiting": "Текст скопирован. Когда партнёр пришлёт свою ссылку, добавь её в «Игре вдвоём».",
+  "inv.st.started": "Ссылка {P_gen} получена: можно смотреть совпадения.",
   "inv.later_title": "Хорошо, не сейчас",
   "inv.later_text": "Ничего не сохранено и никому не отправлено. Ссылка сработает и позже.",
   "w.inv.title": "Игра для двоих",
@@ -1444,14 +1466,14 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "guess.their": "Ответ партнёра: {a}",
   "guess.discuss": "Обсудить",
   "guess.talk": "Можно начать так: «Мне интересно, как ты относишься к пункту „{item}“. Расскажешь?»",
-  "guess.next_note": "Дальше — твоя анкета, около 10 минут. Потом отправь {P_dat} свой код из раздела «Игра вдвоём»: совпадения откроются, когда главную часть пройдёте оба.",
+  "guess.next_note": "Дальше — твоя анкета, около 10 минут. Потом отправь {P_dat} свою ссылку из раздела «Игра вдвоём»: совпадения откроются, когда главную часть пройдёте оба.",
   "guess.next": "Теперь моя очередь",
   "pair.title": "Игра вдвоём",
   "pair.title_with": "Ваши совпадения",
-  "pair.lead": "Без серверов: вы просто обмениваетесь кодами для партнёра, а совпадения считаются прямо на устройстве.",
+  "pair.lead": "Обменяйтесь ссылками: совпадения считаются на устройстве, без сервера.",
   "pair.private": "Ничьи «Нет» не показываются. В «Можно обсудить» хотя бы один из вас ответил «Может».",
   "pair.wait_core": "Совпадения откроются, когда главную часть пройдёте оба.",
-  "pair.need_core": "Код для партнёра появится после главной части.",
+  "pair.need_core": "Твоя ссылка для {P_gen} появится после главной части.",
   "pair.core": "Главное",
   "pair.both": "Хотят оба",
   "pair.discuss": "Можно обсудить",
@@ -1469,26 +1491,26 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "pair.axes_close": "По стилю вы близки.",
   "pair.brakes": "Что поможет {P_dat} расслабиться",
   "pair.none": "Совпадений пока нет. Каждая тема, которую пройдёте оба, может их добавить.",
-  "pair.waiting": "Ждут, когда партнёр пройдёт",
-  "pair.more": "Совпадения по теме открываются, когда её прошли оба. Пришлёт партнёр новый код — совпадения обновятся.",
-  "pair.my_code": "Твой код для партнёра",
-  "pair.my_code_lead": "Отправь партнёру ссылку или код. В нём твоё имя из профиля (если указано), «Да» и «Может» из главной части, откровенных вопросов и пройденных тем, зелёные зоны, уровни, роль в позах и то, что открыто в настройках. В нём нет твоих «Нет», закрытых ответов о том, что мешает, частоты, своей фантазии и скрытых тем.",
-  "pair.code_warn": "Приложение покажет партнёру только совпадения и то, чем ты делишься (зоны, «что важно после»), но по коду технически можно прочитать всё перечисленное выше. Отправляй только тому, кому доверяешь. После новых ответов скопируй код ещё раз.",
-  "pair.add": "Код партнёра",
-  "pair.replace": "Обновить код партнёра",
-  "pair.add_ph": "Вставь ссылку или код партнёра",
+  "pair.waiting": "Ждут, когда {P} пройдёт",
+  "pair.more": "Пришлёт {P} новую ссылку — совпадения обновятся.",
+  "pair.my_code": "Твоя ссылка для {P_gen}",
+  "pair.my_code_lead": "Внутри: имя (если указано), твои «Да» и «Может» из пройденных вопросов и тем, зелёные зоны, уровни, роли в позах и то, что открыто в настройках. Не попадают твои «Нет», закрытые ответы о том, что мешает, частота, своя фантазия и скрытые темы.",
+  "pair.code_warn": "Приложение покажет {P_dat} только совпадения и то, чем ты делишься, но технически из ссылки читается всё перечисленное. Отправляй только тому, кому доверяешь, и копируй заново после новых ответов.",
+  "pair.add": "Ссылка {P_gen}",
+  "pair.replace": "Обновить ссылку {P_gen}",
+  "pair.add_ph": "Вставь ссылку {P_gen}",
   "pair.add_btn": "Добавить",
-  "pair.bad": "Код не прочитался. Проверь, что он скопирован целиком.",
-  "pair.self": "Это твой собственный код.",
-  "pair.confirm": "Код партнёра прочитан. Сохранить его на этом устройстве и показать совпадения?",
+  "pair.bad": "Ссылка не прочиталась. Проверь, что она скопирована целиком.",
+  "pair.self": "Это твоя собственная ссылка.",
+  "pair.confirm": "Ссылка {P_gen} прочитана. Сохранить её на этом устройстве и показать совпадения?",
   "pair.confirm_yes": "Сохранить",
-  "pair.received": "Код партнёра хранится только на этом устройстве.",
+  "pair.received": "Ссылка {P_gen} хранится только на этом устройстве.",
   "pair.delete": "Удалить данные партнёра",
   "pair.deleted": "Данные партнёра удалены",
   "pair.invite_own": "Это твоё приглашение: открыть его может только партнёр.",
   "hint.pair_few": "Совпадений на спокойных пунктах пока мало. Попробуйте начать с разговора, а не с идей; если тема даётся тяжело, помогает семейный психолог или сексолог.",
   "r.pair": "Игра вдвоём",
-  "r.pair.lead": "Ваши общие «Да» и «Может» — без чужих «Нет». Обмениваетесь кодами, без сервера.",
+  "r.pair.lead": "Ваши общие «Да» и «Может» — без чужих «Нет». Обмениваетесь ссылками, без сервера.",
   "r.pair.open": "Играть вдвоём",
   "r.invite.open": "Позвать партнёра",
   "set.pair": "Партнёр",
@@ -1500,13 +1522,13 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "w.inv.replace": "На этом устройстве уже идёт игра вдвоём или ждёт отправленное приглашение. Новая игра их заменит.",
   "mod.peek_stop": "Пока хватит",
   "inv.text_label": "Текст приглашения",
-  "pair.my_code_label": "Твой код для партнёра",
+  "pair.my_code_label": "Твоя ссылка для {P_gen}",
   "pair.todo": "Что с этим делать дальше",
   "pair.todo_lead": "План и идеи собраны только из того, что у вас совпало. Ничьи «Нет» в них не попадают.",
   "plan.open": "Собрать план",
   "idea.open": "Идеи для вас",
-  "idea.eyebrow": "Для вас двоих",
-  "idea.title": "Идеи из совпадений",
+  "idea.eyebrow": "Игра вдвоём",
+  "idea.title": "Идеи для вас",
   "idea.lead": "Здесь только то, на что вы оба ответили «Да» или «Может». Кто в какой роли, видно из ваших ответов.",
   "idea.private": "Пометка «можно обсудить» значит, что хотя бы один из вас ответил «Может».",
   "idea.none": "Для идей пока маловато совпадений. Каждая тема, которую пройдёте оба, подкинет новых.",
@@ -1525,7 +1547,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "idea.k.event": "Событие",
   "idea.k.toy": "Игрушки и покупки",
   "idea.k.pose": "Позы с ролями",
-  "plan.eyebrow": "Для вас двоих",
+  "plan.eyebrow": "Игра вдвоём",
   "plan.title": "План на вас двоих",
   "plan.lead": "Собран из ваших совпадений под выбранный формат. Это подсказка, а не сценарий: меняйте и пропускайте что угодно.",
   "plan.formats": "Формат",
@@ -1568,8 +1590,8 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "myguess.lead_wait": "Выбери, как, по-твоему, ответит {P}. Итог откроется, если {P} пройдёт анкету и решит показать тебе эти ответы.",
   "myguess.lead_ready": "Ответы {P_gen} для угадайки пришли. Отметь догадки и посмотри итог. После итога догадки уже не поменять.",
   "myguess.lead_done": "Итог уже открыт, догадки не меняются.",
-  "myguess.wait": "Догадки сохранятся на этом устройстве. Итог появится, когда придёт код {P_gen} с ответами для угадайки.",
-  "myguess.no_q": "В коде {P_gen} нет ответов для угадайки: показывать их или нет, решает {P}. Догадки сохранятся, если ответы придут позже.",
+  "myguess.wait": "Догадки сохранятся на этом устройстве. Итог появится, когда придёт ссылка {P_gen} с ответами для угадайки.",
+  "myguess.no_q": "В ссылке {P_gen} нет ответов для угадайки: показывать их или нет, решает {P}. Догадки сохранятся, если ответы придут позже.",
   "myguess.see": "Посмотреть итог",
   "myguess.res_all": "Ни одного промаха. Дальше — ваши совпадения и план.",
   "myguess.btn": "Угадать ответы {P_gen}",
@@ -1578,10 +1600,10 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "myguess.step_lead": "Можно угадать, как {P} ответит на те же вопросы. Итог откроется, если {P} поделится ответами.",
   "reveal.title": "Дать {P_dat} угадать твои ответы",
   "reveal.lead": "Можно дать {P_dat} угадать твои ответы на те же вопросы. Эти ответы {P} увидит полностью, включая «Нет». Убери то, что не хочется показывать.",
-  "reveal.add": "Добавить в мой код",
-  "reveal.on": "Убрать ответы из кода",
-  "reveal.in_code": "В код добавлено ответов: {n}, включая «Нет». Скопируй код выше ещё раз. Код, который уже у партнёра, там и останется.",
-  "reveal.off": "Пока ответы в код не добавлены. Без них {P} не увидит итог угадайки.",
+  "reveal.add": "Добавить в мою ссылку",
+  "reveal.on": "Убрать ответы из ссылки",
+  "reveal.in_code": "В ссылку добавлено ответов: {n}, включая «Нет». Скопируй ссылку выше ещё раз. Ссылка, которая уже у партнёра, там и останется.",
+  "reveal.off": "Пока ответы в ссылку не добавлены. Без них {P} не увидит итог угадайки.",
   "kb.prep.voice.t": "Сообщения",
   "kb.prep.voice.d": "Пара откровенных сообщений или голосовое о том, что будет вечером. Можно одно лёгкое задание: что надеть или как встретить.",
   "kb.prep.fantasy.t": "Одна фантазия",
@@ -1764,7 +1786,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "tab.nav": "Разделы",
   "tab.dot": "есть начатое или новое",
   "tabs.coach.t": "Теперь всё по разделам",
-  "tabs.coach": "Внизу четыре вкладки: главное о тебе, темы, игра вдвоём и настройки. Точка на вкладке — там есть начатое или новое.",
+  "tabs.coach": "Внизу четыре вкладки: твой профиль, темы, игра вдвоём и твои настройки. Точка — там что-то новое.",
   "tabs.coach.ok": "Понятно",
   "home.hi": "Привет, <em>{name}</em>",
   "home.hi_anon": "Привет",
@@ -1778,7 +1800,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "home.next.match_d": "Ответы {P_gen} уже здесь.",
   "home.next.invite": "Позови {P_gen} в игру вдвоём",
   "home.next.invite_d": "Пара минут: выбери вопросы для угадайки и отправь ссылку.",
-  "home.next.x_d": "Ещё несколько вопросов, если хочется. После них откроются самые откровенные темы.",
+  "home.next.x_d": "Ещё несколько вопросов, минуты на две. Профиль станет полнее.",
   "home.next.try": "Попробуй тему «{m}»",
   "home.next.go": "Вперёд →",
   "home.sum.gas": "Сильнее всего: {list}",
@@ -1787,7 +1809,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "home.sum.style": "Где ты на четырёх шкалах",
   "home.sum.int": "«Да» — {y}, «может» — {m}",
   "home.sum.none": "Пока мало ответов",
-  "home.prog.core": "Главное",
+  "home.prog.core": "Главные вопросы",
   "home.prog.core_done": "готово",
   "home.prog.core_todo": "не закончено",
   "home.prog.mods": "Темы",
@@ -1806,7 +1828,7 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "pair.st.match": "Ваши совпадения",
   "pair.st.match_wait": "Откроются, когда добавишь ссылку {P_gen}",
   "pair.st.match_n": "Совпадений: {n}",
-  "pair.st.ideas": "Идеи",
+  "pair.st.ideas": "Идеи для вас",
   "pair.st.ideas_d": "Только из ваших «да» и «может»",
   "pair.st.plan": "План на вас двоих",
   "pair.st.plan_d": "Вечер, выходные или каждый день",
@@ -1820,7 +1842,8 @@ body.tabs .toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom, 0px) + 12
   "set.answers": "Мои ответы",
   "set.data": "Сохранить и перенести",
   "set.about": "О приложении",
-  "set.prompt_d": "Скопируй и вставь в любой ИИ-чат, чтобы обсудить профиль"
+  "set.prompt_d": "Скопируй и вставь в любой ИИ-чат, чтобы обсудить профиль",
+  "set.prompt_show": "Показать запрос"
 }
 </script>
 
@@ -2049,7 +2072,8 @@ function computeScales(){
 
 /* ---------- navigation ---------- */
 function go(id){
-  if(!["pause","help","settings","under18","welcome","terms","docs","later","guess","guessres"].includes(id)) UI.lastScreen = id;
+  if(!["pause","help","settings","under18","welcome","terms","docs","later","guess","guessres"].includes(id) && !SET_PARENT[id]) UI.lastScreen = id;
+  if(id!==UI.screen){ UI.showPrompt = false; UI.showCode = false; }   // the code and the AI prompt are shown only on request, every time
   UI.screen=id; save(); render(); window.scrollTo(0,0);
 }
 function next(){
@@ -2141,11 +2165,14 @@ const dockBtn = (act, label, attrs="", ghost=false) => `<button class="btn wide$
 const goBtn = (to, label, ghost=false) => dockBtn("go", label, `data-to="${esc(to)}"`, ghost);
 const subLink = (to, label) => `<button class="btn link small" data-act="go" data-to="${esc(to)}">${label}</button>`;
 const helpLink = () => subLink("help", t("common.help"));
+const pgMore = (...links) => `<div class="pgmore">${links.join("")}</div>`;   // second-plan links at the end of the page
 function hostChat(title, msgs){ return `<div class="chat" aria-live="polite">${title?`<div class="msg title">${title}</div>`:""}${msgs.filter(Boolean).map(m=>`<div class="msg in new">${m}</div>`).join("")}</div>`; }
 const pg = html => `<div class="pg">${html}</div>`;
 const sendNext = (act="next") => `<div class="cbar"><span></span><button class="send" data-act="${act}" aria-label="${t("chat.send")}">${SEND_ICON}</button></div>`;
 
 /* ---------- screens ---------- */
+// Я: nested screens and the screen «Назад» leads to (UX review 2026-11-09)
+const SET_PARENT = {set_priv:"settings", set_pin:"set_priv", set_ans:"settings", set_data:"settings", set_prompt:"set_data", set_code:"set_data", set_import:"set_data", set_about:"settings", set_del:"settings"};
 const VIEWS = {
   welcome(){
     const started = consented();
@@ -2164,7 +2191,8 @@ const VIEWS = {
     const box = (k,label,hint)=>`<button class="check" role="checkbox" aria-checked="${on(k)}" data-act="term" data-k="${k}"><span class="box"></span><span>${label}${hint?`<br><span class="small muted">${hint}</span>`:""}</span></button>`;
     const all = on("age")&&on("terms")&&on("data")&&on("diag");
     return topBar(t("bar.prestart"), {to:"welcome"}) + pg(hostChat(t("t.title"), [t("t.lead")]) +
-      `<div class="stack checks">${box("age",t("t.age"))}${box("terms",t("t.terms"),t("t.terms_hint"))}${box("data",t("t.data"),t("t.data_hint"))}${box("diag",t("t.diag"))}</div>
+      `<div class="stack checks">${box("age",t("t.age"))}${box("terms",t("t.terms"))}${box("data",t("t.data"))}${box("diag",t("t.diag"))}</div>
+      <details class="tmore"><summary class="small muted">${t("t.more")}</summary><ul class="tips small muted"><li>${t("t.terms_hint")}</li><li>${t("t.data_hint")}</li></ul></details>
       <p class="small"><button class="btn link small" data-act="go" data-to="docs">${t("t.read")}</button></p>`) +
       dock(dockBtn("accept", t("common.next"), all?"":"disabled"), subLink("under18", t("t.under")));
   },
@@ -2212,6 +2240,7 @@ const VIEWS = {
       dock(goBtn(UI.helpFrom||"welcome", t("pause.back")));
   },
   settings(){ return settingsView(); },
+  ...Object.fromEntries(Object.keys(SET_PARENT).map(k=>[k, setSubView])),
   mods(){ return modsView(); },
   modgate(){ return modGateView(); },
   mod(){ return modView(); },
@@ -2322,10 +2351,6 @@ function hiddenTopicsField(){
   const h = P.settings.hidden_topics;
   return `<div class="field"><p class="q">${t("w.hide")}</p><p class="small muted">${t("w.hide_hint")}</p><div class="chips">
     ${["power","intens","anal","fant"].map(k=>`<button class="chip" aria-pressed="${h.includes(k)}" data-act="topic" data-k="${k}">${t("topic."+k)}</button>`).join("")}</div></div>`;
-}
-function pinSetter(){
-  return `<label class="q" for="pin-new">${t("p.set")}</label><div class="pin"><input type="password" inputmode="numeric" id="pin-new" maxlength="8" placeholder="${t("p.placeholder")}" autocomplete="off">
-    <button class="btn ghost" data-act="setpin">${t("p.set")}</button></div><p class="err" id="pin-msg" role="alert"></p>`;
 }
 
 
@@ -2450,9 +2475,13 @@ function recommendModules(){
   const later = MODS.filter(m=>!top.includes(m) && seen[m]>0 && score[m]===0 && !topicHidden(m));   // R10: all "No" go to the end, not hidden
   return {top, later};
 }
-function hintBox(key){
-  if(P.settings.dismissed_hints.includes(key)) return "";
-  return `<div class="flag"><p><b>${t("hint.title")}.</b> ${t("hint."+key)}</p><div class="row"><button class="btn link small" data-act="go" data-to="help">${t("common.help")}</button><button class="btn link small" data-act="dismiss" data-k="${key}">${t("hint.dismiss")}</button></div></div>`;
+// several hints on one screen go into one card: one help link, one "hide" for all of them
+function hintBox(...keys){
+  keys = keys.filter(k=>!P.settings.dismissed_hints.includes(k));
+  if(!keys.length) return "";
+  const body = keys.length===1 ? `<p><b>${t("hint.title")}.</b> ${t("hint."+keys[0])}</p>`
+    : `<p><b>${t("hint.title")}</b></p><ul class="tips">${keys.map(k=>`<li>${t("hint."+k)}</li>`).join("")}</ul>`;
+  return `<div class="flag">${body}<div class="row"><button class="btn link small" data-act="go" data-to="help">${t("common.help")}</button><button class="btn link small" data-act="dismiss" data-k="${keys.join(",")}">${t("hint.dismiss")}</button></div></div>`;
 }
 function meterRow(label, v, max, muted){
   const w = v==null?0:Math.max(0,Math.min(1,(v-1)/(max-1)))*100;
@@ -2491,9 +2520,11 @@ function profBlocks(){
       ${notable(k)?`<ul class="tips small">${[1,2].map(n=>`<li>${tip(k,n)}</li>`).join("")}</ul>`:""}</div>`).join("");
   }
   if(pain!=null && pain>=3) brakesHtml += `<div class="brk"><b>${t("brk.pain")}</b><ul class="tips small"><li>${t("tip.pain.1")}</li><li>${t("tip.pain.2")}</li></ul></div>`;
-  if(pain>=4) brakesHtml += hintBox("pain");
-  if(Object.values(S.brakes).filter(v=>v>=4).length>=3 || Object.values(S.brakes).some(v=>v>=5)) brakesHtml += hintBox("brakes");
-  if(num("core.b15")>=4) brakesHtml += hintBox("duty");
+  const hints = [];
+  if(pain>=4) hints.push("pain");
+  if(Object.values(S.brakes).filter(v=>v>=4).length>=3 || Object.values(S.brakes).some(v=>v>=5)) hints.push("brakes");
+  if(num("core.b15")>=4) hints.push("duty");
+  brakesHtml += hintBox(...hints);
   blocks.brakes = (`<section class="card res">${brakesHtml||`<p class="muted">${t("r.brakes.nodata")}</p>`}
     <details><summary class="small muted">${t("r.brakes.all")}</summary><div class="meters" style="padding-top:10px">${Object.keys(BRAKES).map(k=>meterRow(t("brk."+k),S.brakes[k]??null,5,true)).join("")}</div></details></section>`);
 
@@ -2532,8 +2563,8 @@ const TAB_ICON = {
 const LOCK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 const TABS = [["result","tab.home"],["mods","tab.topics"],["pair","tab.pair"],["settings","tab.me"]];
 // every screen that lives inside a tab; anything else (questions, decks, pause, help, onboarding) is shown without the tab bar
-const TAB_OF = {result:"result", prof:"result", mods:"mods", modres:"mods", pair:"pair", pairlink:"pair", pairmatch:"pair", invite:"pair", ideas:"pair", plan:"pair", myguessres:"pair", settings:"settings", docs:"settings"};
-function tabsOn(){ return consented() && UI.resultSeen && !locked && !!TAB_OF[UI.screen] && !(UI.screen==="docs" && UI.docsFrom!=="settings"); }
+const TAB_OF = {result:"result", prof:"result", mods:"mods", modres:"mods", pair:"pair", pairlink:"pair", pairmatch:"pair", invite:"pair", ideas:"pair", plan:"pair", myguessres:"pair", settings:"settings", docs:"settings", ...Object.fromEntries(Object.keys(SET_PARENT).map(k=>[k,"settings"]))};
+function tabsOn(){ return consented() && UI.resultSeen && !locked && !!TAB_OF[UI.screen] && !(UI.screen==="docs" && TAB_OF[UI.docsFrom]!=="settings"); }
 function canInvite(){ return hasPartner() && G?.role!=="invitee" && P.relationship.partner_joins!=="self_only"; }
 function pairReady(){ return !!(G?.partner && coreDone() && G.partner.core); }
 function topicsDot(){ return MODS.some(m=>!modTopicHidden(m) && modState(m)==="started") || (!!P.modules.core_explicit && !UI.lvl3Seen); }
@@ -2582,10 +2613,11 @@ function homeView(){
   // progress
   const vis = MODS.filter(m=>!modTopicHidden(m));
   const pairSt = pc ? t("home.prog.pair_n",{n:pc.y}) : G?.invite?.sent_at || G?.partner ? t("home.prog.pair_wait") : t("home.prog.pair_none");
-  const prog = `<section class="stack" style="gap:8px"><h3>${t("home.progress")}</h3><div class="rows">
-    <button data-act="go" data-to="settings"><span>${t("home.prog.core")}</span><span class="r">${P.modules.core?.done?t("home.prog.core_done"):t("home.prog.core_todo")}</span></button>
-    <button data-act="tab" data-to="mods"><span>${t("home.prog.mods")}</span><span class="r">${t("home.prog.mods_n",{n:vis.filter(modDone).length, k:vis.length})}</span></button>
-    <button data-act="tab" data-to="pair"><span>${t("home.prog.pair")}</span><span class="r">${pairSt}</span></button></div></section>`;
+  // progress: one quiet line, the tabs below already lead to topics and the pair
+  const prog = `<section class="stack" style="gap:6px"><h3>${t("home.progress")}</h3><p class="progline">
+    <span>${t("home.prog.core")}: <b>${P.modules.core?.done?t("home.prog.core_done"):t("home.prog.core_todo")}</b></span>
+    <span>${t("home.prog.mods")}: <b>${t("home.prog.mods_n",{n:vis.filter(modDone).length, k:vis.length})}</b></span>
+    <span>${t("home.prog.pair")}: <b>${pairSt}</b></span></p></section>`;
   const name = P.identity.name ? esc(P.identity.name) : "";
   return topBar(t("app.name"), {noBack:true, right:lockBtn()}) + pg(`<header class="screen"><h2>${name?t("home.hi",{name}):t("home.hi_anon")}</h2><p class="note">${t("r.disclaimer")}</p></header>` +
     (X.anyAnswer ? "" : `<div class="flag"><p>${t("r.empty")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="w1">${t("r.empty.btn")}</button></div></div>`) +
@@ -2594,7 +2626,7 @@ function homeView(){
 function profView(){
   const k = ["gas","brakes","style","interests"].includes(UI.profSec) ? UI.profSec : "gas";
   const X = profBlocks();
-  return topBar(t("r.title"), {to:"result"}) + pg(`<header class="screen"><h2>${t("r."+k)}</h2><p class="note">${t("r.disclaimer")}</p></header>` + X.blocks[k]);
+  return topBar(t("prof.bar"), {to:"result"}) + pg(`<header class="screen"><h2>${t("r."+k)}</h2><p class="note">${t("r.disclaimer")}</p></header>` + X.blocks[k]);
 }
 
 /* Игра вдвоём: one ladder of steps, each step is its own screen */
@@ -2610,14 +2642,15 @@ function pairView(){
   const guess = inv && (G?.invite?.sent_at || partnerQ()) ? `<section class="card"><h3>${t("pair.st.guess")}</h3><p class="small muted">${partnerQ()&&!G.guess.a_seen?t("pair.st.guess_ready"):t("pair.st.guess_d")}</p>
     <div class="row"><button class="btn ghost" data-act="go" data-to="${G.guess.a_seen&&partnerQ()?"myguessres":"myguess"}">${partnerQ()&&!G.guess.a_seen?t("myguess.ready_btn"):t("myguess.btn")}</button></div></section>` : "";
   const tabs = tabsOn();
-  return topBar(t("pair.title"), tabs ? {noBack:true} : {to:"welcome"}) + pg(head("", p ? t("pair.title_with") : t("pair.title"), t("pair.lead")) + `<div class="ladder">${steps.join("")}</div>` + guess) +
+  return topBar(tabs ? "" : t("pair.title"), tabs ? {noBack:true} : {to:"welcome"}) + pg(head("", t("pair.title"), t("pair.lead")) + `<div class="ladder">${steps.join("")}</div>` + guess) +
     (tabs ? "" : dock(goBtn("welcome", t("pause.back")), helpLink()));
 }
 function pairMatchView(){
   const X = pairParts();
   if(X.ready && !UI.matchSeen){ UI.matchSeen = true; save(); }
-  return topBar(t("pair.title"), {to:"pair"}) + pg(head("", t("pair.title_with"), "") + (X.p ? X.compare : `<p class="muted">${t("pair.st.match_wait")}</p>`)) +
-    (X.ready ? dock(goBtn("plan", t("plan.open")), subLink("ideas", t("idea.open")) + helpLink()) : dock(goBtn("pairlink", t("pair.st.link"))));
+  return topBar(t("pair.title"), {to:"pair"}) + pg(head("", t("pair.title_with"), "") + (X.p ? X.compare : `<p class="muted">${t("pair.st.match_wait")}</p>`) +
+      (X.ready ? pgMore(subLink("ideas", t("idea.open")), helpLink()) : "")) +
+    (X.ready ? dock(goBtn("plan", t("plan.open"))) : dock(goBtn("pairlink", t("pair.st.link"))));
 }
 function pairLinkView(){
   const X = pairParts();
@@ -2692,35 +2725,48 @@ function profileCode(){
   delete copy.profile_id; delete copy.created_at; delete copy.updated_at; copy.consent.at = null;
   return "WP1." + btoa(unescape(encodeURIComponent(JSON.stringify(copy))));
 }
+/* Я: the root is a short list of rows, each opens its own screen with «← Назад» to its parent (UX review 2026-11-09) */
+const setRow = (to, title, {sub="", right="", danger=false}={}) => `<button data-act="go" data-to="${to}"><span class="tl"><b${danger?' class="danger"':""}>${title}</b>${sub?`<span class="small muted">${sub}</span>`:""}</span>${right?`<span class="r">${right}</span>`:""}<span class="chev" aria-hidden="true">›</span></button>`;
 function settingsView(){
-  const stepBtns = SCREENS.filter(s=>s.step && !s.extra && screenVisible(s)).map(s=>`<button data-act="go" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t({identity:"id.title",body_early:"be.title",orient:"or.title",rel:"rel.title"}[s.id])}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("")
-    + (P.modules.core_explicit||UI.extraFlow ? SCREENS.filter(s=>s.extra).map(s=>`<button data-act="goextra" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t("bl.title")}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("") : "");
   const home = UI.resultSeen ? "result" : (UI.settingsFrom||"welcome"), tabs = tabsOn();
-  const sec = (title, body) => `<section class="stack" style="gap:8px"><h3>${title}</h3>${body}</section>`;
-  const privacy = sec(t("set.privacy"),
-    (P.settings.pin ? `<div class="rows"><button data-act="locknow"><span class="tl"><b>${t("set.lock_now")}</b><span class="small muted">${t("set.lock_now_d")}</span></span><span class="chev" aria-hidden="true">›</span></button></div>` : "") +
-    `<section class="card"><h3>${t("set.pin")}</h3>${P.settings.pin?`<p>${t("set.pin_on")}</p><div class="row"><button class="btn ghost" data-act="rmpin">${t("set.pin_remove")}</button></div>`:`<p class="small muted">${t("p.lead")}</p>${pinSetter()}`}</section>
+  const rows = `<div class="rows">${setRow("set_priv", t("set.privacy"), {right:P.settings.pin?t("set.pin_on_row"):""})}${setRow("set_ans", t("set.answers"))}${setRow("set_data", t("set.data"))}${setRow("set_about", t("set.about"))}</div>
+    <div class="rows">${setRow("set_del", t("set.delete"), {danger:true})}</div>`;
+  return topBar("", tabs ? {noBack:true} : {to:home}) + pg(head("", t("set.title"), "") + rows) +
+    (tabs ? "" : dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back"))));
+}
+function setSubView(){
+  const k = UI.screen, sub = (title, body, lead="") => topBar(t("set.title"), {to:SET_PARENT[k]}) + pg(head("", title, lead) + body);
+  if(k==="set_priv") return sub(t("set.privacy"),
+    `<div class="rows">${P.settings.pin ? `<button data-act="locknow"><span class="tl"><b>${t("set.lock_now")}</b><span class="small muted">${t("set.lock_now_d")}</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}${setRow("set_pin", t("set.pin"), {right:P.settings.pin?t("set.pin_short"):""})}</div>
     <section class="card">${hiddenTopicsField()}</section>
     <section class="card"><h3>${t("set.share")}</h3><div class="chips">
       <button class="chip" aria-pressed="${P.share_prefs.axes}" data-act="sharetoggle" data-k="axes">${t("set.share_axes")}</button>
       <button class="chip" aria-pressed="${P.share_prefs.brakes}" data-act="sharetoggle" data-k="brakes">${t("set.share_brakes")}</button></div></section>`);
-  const answers = sec(t("set.answers"), `<section class="card"><details><summary>${t("set.steps")}</summary><div class="steps-list" style="padding-top:8px">${stepBtns}</div></details></section>` +
-    (tabs ? "" : `<section class="card"><h3>${t("set.modules")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="mods">${t("mods.all")}</button></div></section>
-    <section class="card"><h3>${t("set.pair")}</h3><div class="row"><button class="btn ghost" data-act="go" data-to="pair">${t("pair.title")}</button></div></section>`));
-  const data = sec(t("set.data"), (UI.resultSeen ? `<section class="card"><h3>${t("r.tools.prompt")}</h3><p class="small muted">${t("set.prompt_d")}</p>
-      ${UI.showPrompt?`<p class="note">${t("r.tools.prompt_warn")}</p><textarea id="prompt-ta" readonly style="word-break:normal">${esc(llmPrompt())}</textarea><div class="row"><button class="btn" data-act="copy" data-src="prompt-ta">${t("common.copy")}</button></div>`
-        :`<div class="row"><button class="btn ghost" data-act="prompt">${t("r.tools.prompt")}</button></div>`}</section>` : "") +
-    `<section class="card"><h3>${t("set.code")}</h3><p class="small muted">${t("set.code_lead")}</p><p class="note">${t("r.tools.code_warn")}</p>
-      <textarea id="code-ta" readonly>${esc(profileCode())}</textarea><div class="row"><button class="btn ghost" data-act="copy" data-src="code-ta">${t("common.copy")}</button></div>
-      <label class="q" for="import-ta">${t("set.import")}</label><textarea id="import-ta" placeholder="${t("set.import_ph")}"></textarea>
-      <div class="row"><button class="btn ghost" data-act="import">${t("set.import_btn")}</button><span class="err" id="import-msg" role="alert"></span></div>
-      ${pendingImport?`<div class="flag"><p>${t("set.import_confirm")}</p><div class="row"><button class="btn" data-act="importyes">${t("set.import_yes")}</button><button class="btn ghost" data-act="importno">${t("set.import_no")}</button></div></div>`:""}
-      <details><summary class="small muted">${t("set.json")}</summary><textarea id="json-ta" readonly style="min-height:220px">${esc(JSON.stringify(P,null,2))}</textarea></details></section>`);
-  const about = sec(t("set.about"), `<div class="rows"><button data-act="go" data-to="docs"><span>${t("doc.title")}</span><span class="chev" aria-hidden="true">›</span></button><button data-act="go" data-to="help"><span>${t("common.help")}</span><span class="chev" aria-hidden="true">›</span></button></div>`);
-  const wipe = `<section class="card"><h3>${t("set.delete")}</h3><p class="small muted">${t("set.delete_lead")}</p>
-      ${UI.askWipe?`<button class="btn" data-act="wipe">${t("set.delete_confirm")}</button>`:`<button class="btn ghost" data-act="askwipe">${t("set.delete")}</button>`}</section>`;
-  return topBar("", tabs ? {noBack:true} : {to:home}) + pg(head("", t("set.title"), "") + privacy + answers + data + about + wipe) +
-    (tabs ? "" : dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back"))));
+  if(k==="set_pin") return P.settings.pin
+    ? sub(t("set.pin"), `<p>${t("set.pin_on")}</p>`) + dock(dockBtn("rmpin", t("set.pin_remove"), "", true))
+    : sub(t("set.pin"), "", t("p.lead")) + dock(`<div class="cbar"><input type="password" inputmode="numeric" id="pin-new" maxlength="8" placeholder="${t("p.placeholder")}" autocomplete="off" enterkeyhint="send" aria-label="${esc(t("p.set"))}">
+        <button class="send" data-act="setpin" aria-label="${esc(t("p.set"))}">${SEND_ICON}</button></div><p class="err" id="pin-msg" role="alert"></p>`);
+  if(k==="set_ans"){
+    const stepBtns = SCREENS.filter(s=>s.step && !s.extra && screenVisible(s)).map(s=>`<button data-act="go" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t({identity:"id.title",body_early:"be.title",orient:"or.title",rel:"rel.title"}[s.id])}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("")
+      + (P.modules.core_explicit||UI.extraFlow ? SCREENS.filter(s=>s.extra).map(s=>`<button data-act="goextra" data-to="${s.id}"><span>${s.kind?t(s.title+".title"):t("bl.title")}</span><span class="small muted">${esc(stepLabel(s))}</span></button>`).join("") : "");
+    return sub(t("set.answers"), `<section class="stack" style="gap:8px"><h3>${t("set.steps")}</h3><div class="steps-list">${stepBtns}</div></section>` +
+      (tabsOn() ? "" : `<div class="rows"><button data-act="go" data-to="mods"><span>${t("mods.all")}</span><span class="chev" aria-hidden="true">›</span></button><button data-act="go" data-to="pair"><span>${t("pair.title")}</span><span class="chev" aria-hidden="true">›</span></button></div>`));
+  }
+  if(k==="set_data") return sub(t("set.data"), `<div class="rows">${UI.resultSeen ? setRow("set_prompt", t("r.tools.prompt"), {sub:t("set.prompt_d")}) : ""}${setRow("set_code", t("set.code"), {sub:t("set.code_lead")})}${setRow("set_import", t("set.import"))}</div>`);
+  if(k==="set_prompt") return sub(t("r.tools.prompt"), `<p class="note">${t("r.tools.prompt_warn")}</p>` +
+      (UI.showPrompt ? `<textarea id="prompt-ta" readonly style="word-break:normal;min-height:260px">${esc(llmPrompt())}</textarea>` : ""), t("set.prompt_d")) +
+    dock(UI.showPrompt ? dockBtn("copy", t("common.copy"), `data-src="prompt-ta"`) : dockBtn("prompt", t("set.prompt_show")));
+  if(k==="set_code") return sub(t("set.code"), `<p class="note">${t("r.tools.code_warn")}</p>` +
+      (UI.showCode ? `<textarea id="code-ta" readonly>${esc(profileCode())}</textarea>` : "") +
+      `<section class="card"><details><summary class="small muted">${t("set.json")}</summary><textarea id="json-ta" readonly style="min-height:220px">${esc(JSON.stringify(P,null,2))}</textarea></details></section>`, t("set.code_lead")) +
+    dock(UI.showCode ? dockBtn("copy", t("common.copy"), `data-src="code-ta"`) : dockBtn("showcode", t("set.code_show")));
+  if(k==="set_import") return sub(t("set.import"), `<textarea id="import-ta" aria-label="${esc(t("set.import"))}" placeholder="${t("set.import_ph")}"></textarea><p class="err" id="import-msg" role="alert"></p>` +
+      (pendingImport ? `<div class="flag"><p>${t("set.import_confirm")}</p></div>` : "")) +
+    dock(pendingImport ? dockBtn("importyes", t("set.import_yes")) : dockBtn("import", t("set.import_btn")), pendingImport ? `<button class="btn link small" data-act="importno">${t("set.import_no")}</button>` : "");
+  if(k==="set_about") return sub(t("set.about"), `<div class="rows">${setRow("docs", t("doc.title"))}${setRow("help", t("common.help"))}</div>`);
+  if(k==="set_del") return sub(t("set.delete"), "", t("set.delete_lead")) +
+    dock(UI.askWipe ? dockBtn("wipe", t("set.delete_confirm")) : dockBtn("askwipe", t("set.delete"), "", true), UI.askWipe ? `<button class="btn link small" data-act="go" data-to="settings">${t("set.import_no")}</button>` : "");
+  return settingsView();
 }
 
 /* ---------- PIN (lock only, answers stay unencrypted) ---------- */
@@ -2881,7 +2927,7 @@ function modIntro(m){
   if(m==="toys") out.push(t("tip.toys.care"));
   if(m==="poses" && !["pen","rec"].includes(poseRole())) out.push(t("poses.legend"));
   if(!hasPartner() && ["wear","attr","toys","poses","power","intens","anal","fant"].includes(m)) out.push(t("mod.intro.no_partner"));
-  return out.map(s=>`<p class="note">${s}</p>`).join("");
+  return out;
 }
 function modTile(m){
   const st = modState(m);
@@ -2891,33 +2937,29 @@ function modsView(){
   const coreSeen = UI.resultSeen;
   const vis = MODS.filter(m=>!modTopicHidden(m));
   const decks = [1,2,3].map(l=>{ const ms = vis.filter(m=>MOD_LVL[m]===l); if(!ms.length) return "";
-    return `<section class="stack" style="gap:8px"><h3>${t("mods.lvl."+l)}</h3><div class="tiles">${ms.map(modTile).join("")}</div></section>`; }).join("");
+    const note = l===3 && coreSeen && !P.modules.core_explicit ? `<p class="small muted">${t("mods.lvl3_later")}</p>` : "";
+    return `<section class="stack" style="gap:8px"><h3>${t("mods.lvl."+l)}</h3>${note}<div class="tiles">${ms.map(modTile).join("")}</div></section>`; }).join("");
   const home = UI.resultSeen ? "result" : "welcome", tabs = tabsOn();
   if(P.modules.core_explicit && !UI.lvl3Seen){ UI.lvl3Seen = true; save(); }
   return topBar("", tabs ? {noBack:true} : {to:home}) + pg(head("", t("mods.title"), t("mods.lead")) +
     (coreSeen ? "" : `<p class="note">${t("mods.after_core")}</p>`) +
-    (coreSeen && !P.modules.core_explicit ? `<p class="small muted">${t("mods.lvl3_later")}</p>` : "") + decks +
+    decks +
     (vis.length<MODS.length ? `<p class="small muted">${t("mods.hidden")}</p>` : "")) +
     (tabs ? "" : dock(goBtn(home, UI.resultSeen?t("common.to_result"):t("pause.back"))));
 }
+// the topic's only intro: the host's notes are here, "Начать" opens the first question right away
 function modGateView(){
-  const m = UI.mod, g = P.modules[m]?.gate;
-  return topBar(t("mods.lvl."+MOD_LVL[m]), {to:"mods", right:barPause()}) + hostChat(t("mod."+m), [t("mod.gate."+m), `<span class="muted">${t("mod.gate.lead")}</span>`]) +
-    dock(`<div class="chips">${["open","peek","skip"].map(k=>`<button class="chip" aria-pressed="${g===k}" data-act="gate" data-k="${k}">${t("opt.gate."+k)}</button>`).join("")}</div>`, helpLink());
+  const m = UI.mod;
+  return topBar(t("mods.lvl."+MOD_LVL[m]), {to:"mods", right:barPause()}) + hostChat(t("mod."+m), [t("mod.gate."+m), ...modIntro(m), `<span class="muted">${t("mod.gate.lead")}</span>`]) +
+    dock(dockBtn("gate", t("opt.gate.open"), `data-k="open"`), ["peek","skip"].map(k=>`<button class="btn link small" data-act="gate" data-k="${k}">${t("opt.gate."+k)}</button>`).join("") + helpLink());
 }
 const M_AUTO = new Set(["yn","ynf","pose","zone","lvl","freq","one"]);   // one tap answers these, so the next question follows
 function modView(){
   const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), items = pages[page];
   const peek = P.modules[m]?.gate==="peek" && !UI.peekMore?.[m];
-  UI.mi ||= {}; UI.modIntroSeen ||= {};
+  UI.mi ||= {};
   if(!items.length) return modBar(m, page, pages.length) + hostChat(t("mod."+m), [t("mod.empty")]) +
     dock(dockBtn("modnext", t("mod.finish")), subLink("mods", t("mod.to_list")));
-  if(page===0 && !UI.modIntroSeen[m]){
-    const notes = modIntro(m).replace(/<p class="note">/g,'<div class="msg in new">').replace(/<\/p>/g,"</div>");
-    return modBar(m, page, pages.length) + `<div class="chat" aria-live="polite"><div class="msg title">${t("mod."+m)}</div>
-      <div class="msg in new">${t(MODULES[m].some(it=>it.t==="yn"||it.t==="yn2")?"core.w1.lead":"mod.gate."+m)}</div>${notes}</div>
-      <div class="dock"><button class="btn wide" data-act="modintro">${t("chat.go")}</button></div>`;
-  }
   const k = m+":"+page, i = Math.max(0, Math.min(items.length-1, UI.mi[k]||0)), it = items[i], id = it.id, v = P.answers[id];
   const total = pages.reduce((a,p)=>a+p.length,0), pos = pages.slice(0,page).reduce((a,p)=>a+p.length,0)+i+1;
   const label = it.t==="lvl" ? t("q."+id) : qText(id);
@@ -2929,7 +2971,7 @@ function modView(){
     ${it.t==="lvl"?`<p class="qhint">${t("mod.lvl_hint")}</p>`:""}<div class="qone">${modItem(it)}</div>
     ${M_AUTO.has(it.t)?"":`<button class="btn wide" data-act="mstep">${t("common.next")}</button>`}`;
   const last = page===pages.length-1 && i===items.length-1;
-  return modBar(m, page, pages.length) + `<div class="qpage"><div class="qmeta"><span>${esc(t("mod."+m))}</span><span>${t("q.n_of",{n:pos,k:total})}</span></div>${body}
+  return modBar(m, page, pages.length) + `<div class="qpage"><div class="qmeta"><span></span><span>${t("q.n_of",{n:pos,k:total})}</span></div>${body}
     <div class="qfoot"><button data-act="skipq" data-id="${id}">${t("common.skip")}</button>${id in P.answers?`<button class="fwd" data-act="mfwd">${t("common.next")} →</button>`:""}
     ${peek && modItems(m).length>5 ? `<button data-act="peekmore">${t("mod.peek_more")}</button>` : peek||last ? `<button data-act="modnext" data-whole="1">${peek?t("mod.peek_stop"):t("mod.finish")}</button>` : `<button data-act="go" data-to="help">${t("common.help")}</button>`}</div></div>`;
 }
@@ -2942,7 +2984,6 @@ function mBack(){
   const m = UI.mod, pages = modPages(m), page = Math.min(UI.modPage||0, pages.length-1), k = m+":"+page, i = UI.mi[k]||0;
   if(i > 0){ UI.mi[k] = i-1; save(); render(); window.scrollTo(0,0); return; }
   if(page > 0){ UI.modPage = page-1; UI.mi[m+":"+(page-1)] = pages[page-1].length-1; return go("mod"); }
-  if(UI.modIntroSeen?.[m]){ UI.modIntroSeen[m] = false; save(); return render(); }
   go("modgate");
 }
 function modNextPage(){
@@ -3123,16 +3164,17 @@ function startAsInvitee(inv){
 }
 function inviteView(){
   const c = guessCandidates(), sel = inviteSel();
-  const status = G?.partner ? t("inv.st.started") : G?.invite?.sent_at ? t("inv.st.waiting") : "";
-  const chips = c.map(id=>`<button class="chip" aria-pressed="${sel.includes(id)}" data-act="invsel" data-id="${id}">${esc(qText(id))} · <span class="muted">${t("opt.yn."+["no","maybe","yes"][P.answers[id]])}</span></button>`).join("");
+  const status = G?.partner ? t("inv.st.started") : G?.invite?.sent_at ? t("inv.st.waiting")+" "+t("inv.patience") : "";
+  const INV_SHOW = 6, more = UI.invAll ? 0 : Math.max(0, c.length-INV_SHOW);   // a few chips first, the rest on request
+  const chips = c.slice(0, more ? INV_SHOW : c.length).map(id=>`<button class="chip" aria-pressed="${sel.includes(id)}" data-act="invsel" data-id="${id}">${esc(qText(id))} · <span class="muted">${t("opt.yn."+["no","maybe","yes"][P.answers[id]])}</span></button>`).join("")
+    + (more ? `<button class="chip more" data-act="invall" aria-expanded="false">${t("inv.more",{n:more})}</button>` : "");
   return topBar(t("pair.title"), {to:"pair"}) + `<div class="pg">` + head("", t("inv.title"), t("inv.lead")) +
     (status ? `<p class="note">${status}</p>` : "") +
     `<section class="card"><h3>${t("inv.step1")}</h3><p class="small muted">${t("inv.step1_lead")}</p>
       ${c.length ? `<div class="chips">${chips}</div><p class="small ${sel.length<10?"":"muted"}">${t("inv.count",{n:sel.length})}${sel.length<10?" "+t("inv.few"):""}</p>` : `<p class="muted">${t("inv.none")}</p>`}</section>
     <section class="card"><h3>${t("inv.step2")}</h3><textarea id="inv-ta" data-invtext="1" aria-label="${t("inv.text_label")}" style="word-break:normal;font-size:15px">${esc(inviteText())}</textarea>
       <p class="small muted">${t("inv.text_note")}</p></section>
-    <section class="card"><h3>${t("inv.step3")}</h3><p class="note">${t("inv.link_note")}</p><p class="small muted">${t("inv.patience")}</p></section>
-    ${G?.invite?.sent_at ? `<section class="card"><h3>${t("myguess.step")}</h3><p class="small muted">${t("myguess.step_lead")}</p><div class="row"><button class="btn ghost" data-act="go" data-to="myguess">${t("myguess.btn")}</button></div></section>` : ""}</div>` +
+    <p class="small muted">${t("inv.link_note")}</p></div>` +
     dock(dockBtn("invcopy", t("inv.copy"), sel.length?"":"disabled"), tabsOn() ? "" : subLink("pair", t("pair.title")));
 }
 // guess games: one card at a time, then a short wrap-up before the result
@@ -3240,10 +3282,10 @@ function pairParts(){
         if(nb.length) brakes = `<section class="card res"><h3>${t("pair.brakes")}</h3><ul class="tips small">${nb.map(([k])=>`<li><b>${t("brk."+k)}.</b> ${t("tip."+k+".1")}</li>`).join("")}</ul></section>`; }
       const few = p.l1>=0.8 && l1Share()>=0.8 && R.l1<5 ? hintBox("pair_few") : "";
       const waiting = MODS.filter(m=>modDone(m) && !p.mods.includes(m));
-      const todo = `<p class="note">${t("pair.todo_lead")}</p>`;
+      
       const nY = R.sections.reduce((a,x)=>a+x.yes.length+x.lines.filter(l=>l.c!=="maybe").length,0), nM = R.sections.reduce((a,x)=>a+x.maybe.length+x.lines.filter(l=>l.c==="maybe").length,0);
       const hero = `<div class="pairhero"><b>${nY}</b><span>${t("pair.hero",{n:nY})}</span>${nM?`<span class="muted">${t("pair.hero_m",{n:nM})}</span>`:""}</div>`;
-      compare = `${hero}<p class="note">${t("pair.private")}</p>${todo}${few}${secHtml||`<p class="muted">${t("pair.none")}</p>`}${talk}${style}${brakes}
+      compare = `${hero}<p class="note">${t("pair.private")}</p>${few}${secHtml||`<p class="muted">${t("pair.none")}</p>`}${talk}${style}${brakes}
         ${waiting.length?`<p class="small muted">${t("pair.waiting")}: ${waiting.map(m=>t("mod."+m)).join(", ")}</p>`:""}<p class="small muted">${t("pair.more")}</p>`;
     }
   }
@@ -3479,21 +3521,23 @@ function safeNote(keys){ return [...new Set(keys||[])].map(k=>`<p class="small">
 function ideasView(){
   if(!G?.partner || !coreDone() || !G.partner.core) return pairView();
   const ideas = pairIdeas(), poses = pairPoses();
-  const groups = KB_KINDS.map((kind,gi)=>{
+  let firstOpen = true;
+  const groups = KB_KINDS.map(kind=>{
     const list = ideas.filter(k=>k.k===kind).sort((a,b)=>(a.rate==="b")-(b.rate==="b") || b.score-a.score);
     if(!list.length) return "";
-    return `<section class="card res"><details${gi<3?" open":""}><summary><h3 style="display:inline">${t("idea.k."+kind)}</h3> <span class="small muted">· ${list.length}</span></summary><div class="stack" style="margin-top:10px">${list.map(k=>`<div class="brk"${k.rate==="b"?' style="opacity:.6"':""}>
+    const open = firstOpen; firstOpen = false;
+    return `<section class="card res"><details${open?" open":""}><summary><h3>${t("idea.k."+kind)}</h3><span class="cnt">${list.length}</span></summary><div class="stack" style="margin-top:10px">${list.map(k=>`<div class="brk"${k.rate==="b"?' style="opacity:.6"':""}>
       <b>${esc(t("kb."+k.id+".t"))}${k.sure?"":` <span class="pill m">${t("pair.discuss").toLowerCase()}</span>`}</b>
       <span class="small">${esc(t("kb."+k.id+".d"))}</span>${k.dir?`<span class="small muted">${esc(ideaRole(k))}</span>`:""}
       ${lvlNote(k.lvl)}${safeNote([k.s].filter(Boolean))}${rateBtns(k.id)}</div>`).join("")}</div></details></section>`;
   }).join("");
-  const poseHtml = poses.length ? `<section class="card res"><details><summary><h3 style="display:inline">${t("idea.k.pose")}</h3> <span class="small muted">· ${Math.min(poses.length,12)}</span></summary><div class="stack" style="margin-top:10px">${poses.slice(0,12).map(p=>`<div class="brk"><b>${esc(p.q)}${p.fresh?` <span class="pill m">${t("idea.new")}</span>`:""}</b>${p.r?`<span class="small muted">${esc(p.r)}</span>`:""}${rateBtns(p.id)}</div>`).join("")}</div></details></section>` : "";
+  const poseHtml = poses.length ? `<section class="card res"><details><summary><h3>${t("idea.k.pose")}</h3><span class="cnt">${Math.min(poses.length,12)}</span></summary><div class="stack" style="margin-top:10px">${poses.slice(0,12).map(p=>`<div class="brk"><b>${esc(p.q)}${p.fresh?` <span class="pill m">${t("idea.new")}</span>`:""}</b>${p.r?`<span class="small muted">${esc(p.r)}</span>`:""}${rateBtns(p.id)}</div>`).join("")}</div></details></section>` : "";
   const pw = ideas.some(k=>k.pw);
   return topBar(t("idea.eyebrow"), {to:"pair"}) + pg(head("", t("idea.title"), t("idea.lead")) + `<p class="note">${t("idea.private")}</p>` +
     (pw ? `<p class="note">${t("pair.agree")}</p>` : "") +
     (groups||poseHtml ? groups + poseHtml : `<p class="muted">${t("idea.none")}</p>`) +
-    `<p class="small muted">${t("idea.rate_note")}</p>`) +
-    dock(goBtn("plan", t("plan.open")), subLink("pair", t("pair.title_with")));
+    `<p class="small muted">${t("idea.rate_note")}</p>` + pgMore(subLink("pairmatch", t("pair.title_with")))) +
+    dock(goBtn("plan", t("plan.open")));
 }
 function planView(){
   if(!G?.partner || !coreDone() || !G.partner.core) return pairView();
@@ -3508,9 +3552,9 @@ function planView(){
       <p class="small muted">${t("plan.total",{n:plan.total})}</p>
       <div class="row"><button class="btn ghost" data-act="planagain">${t("plan.again")}</button><button class="btn ghost" aria-pressed="${!!UI.planRate}" data-act="planrate">${t("plan.rate")}</button></div>
       ${UI.planRate?`<p class="small muted">${t("idea.rate_note")}</p>`:""}</section>
-    <p class="small muted">${t("plan.note")}</p></div>` +
+    <p class="small muted">${t("plan.note")}</p>${pgMore(subLink("ideas", t("idea.open")), subLink("pairmatch", t("pair.title_with")))}</div>` +
     dock(UI.planCopyAsk ? `<p class="small">${t("plan.copy_ask")}</p>${dockBtn("plancopy", t("plan.copy_yes"))}` : dockBtn("plancopy", t("plan.copy")),
-      UI.planCopyAsk ? `<button class="btn link small" data-act="plancopyno">${t("set.import_no")}</button>` : subLink("ideas", t("idea.open")) + subLink("pair", t("pair.title_with")));
+      UI.planCopyAsk ? `<button class="btn link small" data-act="plancopyno">${t("set.import_no")}</button>` : "");
 }
 
 /* inviter's side of the guess game (spec 14.1 p. 4): guesses are made here before or after the partner answers;
@@ -3521,7 +3565,7 @@ function myGuessView(){
   ensureGroup();
   const ids_ = myGuessIds(), g = G.guess.a_about_b, done = !!G.guess.a_seen, q = partnerQ();
   const lead = q ? (done ? t("myguess.lead_done") : t("myguess.lead_ready")) : t("myguess.lead_wait");
-  const finish = q ? `<button class="btn wide" data-act="myguessdone">${done?t("myguess.see"):t("guess.done")}</button><div class="row"><button class="btn link" data-act="go" data-to="pair">${t("pair.title_with")}</button></div>`
+  const finish = q ? `<button class="btn wide" data-act="myguessdone">${done?t("myguess.see"):t("guess.done")}</button><div class="row"><button class="btn link" data-act="go" data-to="pair">${t("pair.title")}</button></div>`
     : `<p class="note">${G.partner ? t("myguess.no_q") : t("myguess.wait")}</p><button class="btn wide" data-act="go" data-to="${G.partner?"pair":"invite"}">${t("myguess.save_exit")}</button>`;
   if(!ids_.length) return topBar(t("guess.eyebrow"), {to:"pair"}) + hostChat(t("myguess.title"), [lead, t("inv.none")]) + `<div class="dock">${finish}</div>`;
   return deckPage("myguess", ids_, g, "myguess", {title:t("myguess.title"), eyebrow:t("guess.eyebrow"), lead, doneLabel:t("guess.done"), done:finish, locked:done});
@@ -3534,7 +3578,7 @@ function myGuessResView(){
   const rows = miss.map(id=>`<div class="brk"><b>${esc(qText(id))}</b><span class="small">${t("myguess.res_line",{g:yn(g[id]),a:yn(key[id])})}</span>
     ${open[id]?`<p class="small">${t("guess.talk",{item:qText(id)})}</p>`:`<div class="row"><button class="btn link small" data-act="guessopen" data-id="${id}">${t("guess.discuss")}</button></div>`}</div>`).join("");
   return topBar(t("guess.eyebrow"), {to:"pair"}) + pg(head("", t("guess.res_title",{n:hit.length,k:ids_.length}), miss.length?t("guess.res_lead",{n:miss.length}):t("myguess.res_all")) +
-    `<div class="stack">${rows}</div>`) + dock(goBtn("pair", t("pair.title_with")));
+    `<div class="stack">${rows}</div>`) + dock(goBtn("pair", t("pair.title")));
 }
 // invitee: answers opened for the inviter's guess game, sent inside WPP1 only after an explicit choice
 function revealCandidates(){ return guessCandidates().filter(id=>!ITEM[id] || modDone(ITEM[id].mod)); }
@@ -3606,7 +3650,7 @@ app.addEventListener("click", async e=>{
       const to = b.dataset.to;
       if(to==="help") UI.helpFrom = UI.screen;
       if(to==="docs") UI.docsFrom = UI.screen;
-      if(to==="settings") UI.settingsFrom = UI.screen;
+      if(to==="settings" && !SET_PARENT[UI.screen]) UI.settingsFrom = UI.screen;
       UI.askWipe = false;
       return go(to);
     }
@@ -3691,10 +3735,11 @@ app.addEventListener("click", async e=>{
     }
     case "skipfrom": if(["guess","guessres"].includes(UI.pausedAt)){ UI.lastPauseAt=null; return go("identity"); }
       if(["mod","modgate"].includes(UI.pausedAt)){ P.modules[UI.mod] = {...(P.modules[UI.mod]||{}), gate:"skip", at:now()}; UI.lastPauseAt=null; return go("mods"); } { UI.screen = UI.pausedAt; UI.lastPauseAt=null; const s=SCR[UI.pausedAt]; if(s?.kind==="items") s.items.forEach(id=>{ if(!(id in P.answers)) P.answers[id]=null; }); return next(); }
-    case "dismiss": P.settings.dismissed_hints.push(b.dataset.k); save(); return rerender();
+    case "dismiss": P.settings.dismissed_hints.push(...b.dataset.k.split(",")); save(); return rerender();
     case "share": P.share_prefs[b.dataset.k] = b.dataset.v==="1"; save(); return rerender();
     case "sharetoggle": P.share_prefs[b.dataset.k] = !P.share_prefs[b.dataset.k]; save(); return rerender();
     case "prompt": UI.showPrompt = !UI.showPrompt; return rerender();
+    case "showcode": UI.showCode = true; return rerender();
     case "copy": return copyFrom(b.dataset.src);
     case "setpin": {
       const v = document.getElementById("pin-new").value;
@@ -3760,7 +3805,6 @@ app.addEventListener("click", async e=>{
       if(arr.length) P.answers[id] = arr; else delete P.answers[id];
       save(); return rerender();
     }
-    case "modintro": UI.modIntroSeen[UI.mod] = true; UI.mi[UI.mod+":0"] = 0; save(); render(); window.scrollTo(0,0); return;
     case "mstep": return mAdvance();
     case "mback": return mBack();
     case "deckgo": { UI.deck ||= {}; UI.deck[b.dataset.key] = Math.max(0, Number(b.dataset.i)); save(); render(); window.scrollTo(0,0); return; }
@@ -3776,6 +3820,7 @@ app.addEventListener("click", async e=>{
     /* invite and guess */
     case "invlater": pendingInvite = null; return go("later");
     case "invaccept": if(pendingInvite){ startAsInvitee(pendingInvite); return go("guess"); } return go("welcome");
+    case "invall": UI.invAll = true; return rerender();
     case "invsel": { const id=b.dataset.id, s=inviteSel(); UI.inviteSel = s.includes(id) ? s.filter(x=>x!==id) : s.length>=15 ? s : [...s,id]; save(); return rerender(); }
     case "invcopy": {
       const text = (document.getElementById("inv-ta")?.value || inviteText()).trim() + "\n" + inviteLink();
